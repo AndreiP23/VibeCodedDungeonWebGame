@@ -1,0 +1,210 @@
+{
+  "00b7a7c5-226b-4b5a-a61c-4182a57443f9": {
+    "player": {
+      "name": "Arin",
+      "class": "warrior",
+      "hp": {
+        "current": 26,
+        "max": 26
+      },
+      "stats": {
+        "str": 4,
+        "dex": 1,
+        "int": 0,
+        "cha": 1
+      },
+      "inventory": [
+        "longsword",
+        "shield",
+        "torch"
+      ],
+      "gold": 12,
+      "location": "Broken Crown Tavern"
+    },
+    "world": {
+      "currentScene": "Fumul gros si mirosul de bere acopera soaptele despre fiica disparuta a primarului.",
+      "discoveredLocations": [
+        "Broken Crown Tavern"
+      ],
+      "activeQuests": [
+        {
+          "id": "find-mayor-daughter",
+          "title": "Find the Mayor's Missing Daughter",
+          "description": "Follow clues from the Broken Crown Tavern into Blackwolf Forest and confront the source in Goblin Cave.",
+          "status": "active"
+        }
+      ]
+    },
+    "npcs": [
+      {
+        "id": "innkeeper_borin",
+        "name": "Borin",
+        "race": "dwarf",
+        "personality": "precaut, prietenos cu cei care ii castiga increderea",
+        "secrets": [
+          "stie locatia comorii ascunse sub taverna"
+        ],
+        "speechStyle": "propozitii scurte, ocazional injuraturi piticesti",
+        "location": "Broken Crown Tavern"
+      },
+      {
+        "id": "witch_lyra",
+        "name": "Lyra",
+        "race": "elf",
+        "personality": "calma, criptica, observa orice detaliu",
+        "secrets": [
+          "a vazut urme de magie neagra in padure"
+        ],
+        "speechStyle": "fraze poetice, ton misterios",
+        "location": "Blackwolf Forest"
+      },
+      {
+        "id": "captain_aldric",
+        "name": "Captain Aldric",
+        "race": "human",
+        "personality": "disciplinat, suspicios, loial orasului",
+        "secrets": [
+          "a ascuns o patrula disparuta pentru a evita panica"
+        ],
+        "speechStyle": "clar, militar, la obiect",
+        "location": "Broken Crown Tavern"
+      },
+      {
+        "id": "grix",
+        "name": "Grix",
+        "race": "goblin",
+        "personality": "violent, viclean, oportunist",
+        "secrets": [
+          "a rapit fiica primarului la ordinul unui necunoscut"
+        ],
+        "speechStyle": "taioasa, batjocoritoare",
+        "location": "Goblin Cave",
+        "armorClass": 13,
+        "hp": 24
+      }
+    ],
+    "shortTermMemory": [
+      {
+        "role": "system",
+        "content": "You arrived in Broken Crown Tavern to investigate the mayor's missing daughter.",
+        "timestamp": "2026-05-05T18:27:45.642Z"
+      }
+    ],
+    "longTermMemory": [
+      {
+        "id": "67240b05-f954-4706-9473-69c4e2a78001",
+        "summary": "Quest started: find the mayor's missing daughter.",
+        "tags": [
+          "quest",
+          "mayor",
+          "missing daughter"
+        ],
+        "timestamp": "2026-05-05T18:27:45.642Z"
+      }
+    ]
+  },
+  "763bdd15-1e3e-41ea-85fd-ba6d03e60940": {
+    "player": {
+      "name": "GOJO",
+      "class": "rogue",
+      "hp": {
+        "current": 20,
+        "max": 20
+      },
+      "stats": {
+        "str": 1,
+        "dex": 4,
+        "int": 1,
+        "cha": 2
+      },
+      "inventory": [
+        "dagger",
+        "lockpick set",
+        "smoke vial"
+      ],
+      "gold": 16,
+      "location": "Broken Crown Tavern"
+    },
+    "world": {
+      "currentScene": "Fumul gros si mirosul de bere acopera soaptele despre fiica disparuta a primarului.",
+      "discoveredLocations": [
+        "Broken Crown Tavern"
+      ],
+      "activeQuests": [
+        {
+          "id": "find-mayor-daughter",
+          "title": "Find the Mayor's Missing Daughter",
+          "description": "Follow clues from the Broken Crown Tavern into Blackwolf Forest and confront the source in Goblin Cave.",
+          "status": "active"
+        }
+      ]
+    },
+    "npcs": [
+      {
+        "id": "innkeeper_borin",
+        "name": "Borin",
+        "race": "dwarf",
+        "personality": "precaut, prietenos cu cei care ii castiga increderea",
+        "secrets": [
+          "stie locatia comorii ascunse sub taverna"
+        ],
+        "speechStyle": "propozitii scurte, ocazional injuraturi piticesti",
+        "location": "Broken Crown Tavern"
+      },
+      {
+        "id": "witch_lyra",
+        "name": "Lyra",
+        "race": "elf",
+        "personality": "calma, criptica, observa orice detaliu",
+        "secrets": [
+          "a vazut urme de magie neagra in padure"
+        ],
+        "speechStyle": "fraze poetice, ton misterios",
+        "location": "Blackwolf Forest"
+      },
+      {
+        "id": "captain_aldric",
+        "name": "Captain Aldric",
+        "race": "human",
+        "personality": "disciplinat, suspicios, loial orasului",
+        "secrets": [
+          "a ascuns o patrula disparuta pentru a evita panica"
+        ],
+        "speechStyle": "clar, militar, la obiect",
+        "location": "Broken Crown Tavern"
+      },
+      {
+        "id": "grix",
+        "name": "Grix",
+        "race": "goblin",
+        "personality": "violent, viclean, oportunist",
+        "secrets": [
+          "a rapit fiica primarului la ordinul unui necunoscut"
+        ],
+        "speechStyle": "taioasa, batjocoritoare",
+        "location": "Goblin Cave",
+        "armorClass": 13,
+        "hp": 24
+      }
+    ],
+    "shortTermMemory": [
+      {
+        "role": "system",
+        "content": "You arrived in Broken Crown Tavern to investigate the mayor's missing daughter.",
+        "timestamp": "2026-05-05T18:34:02.715Z"
+      }
+    ],
+    "longTermMemory": [
+      {
+        "id": "0de6cf33-4d96-48ee-b5a3-4f919f1e7539",
+        "summary": "Quest started: find the mayor's missing daughter.",
+        "tags": [
+          "quest",
+          "mayor",
+          "missing daughter"
+        ],
+        "timestamp": "2026-05-05T18:34:02.715Z"
+      }
+    ]
+  }
+}

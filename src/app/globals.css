@@ -1,0 +1,31 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --background: 222 47% 8%;
+  --foreground: 210 40% 96%;
+  --card: 222 45% 12%;
+  --card-foreground: 210 40% 96%;
+  --primary: 33 95% 56%;
+  --primary-foreground: 222 47% 10%;
+  --muted: 222 35% 18%;
+  --muted-foreground: 215 20% 70%;
+  --border: 217 33% 30%;
+  --input: 217 33% 26%;
+  --accent: 196 70% 45%;
+  --accent-foreground: 210 40% 97%;
+}
+
+html,
+body {
+  height: 100%;
+}
+
+* {
+  @apply border-border;
+}
+
+body {
+  font-family: var(--font-display), "Segoe UI", sans-serif;
+}

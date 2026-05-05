@@ -1,0 +1,20 @@
+[
+  {
+    "id": "broken_crown_tavern",
+    "name": "Broken Crown Tavern",
+    "description": "Fumul gros si mirosul de bere acopera soaptele despre fiica disparuta a primarului.",
+    "connected": ["blackwolf_forest"]
+  },
+  {
+    "id": "blackwolf_forest",
+    "name": "Blackwolf Forest",
+    "description": "Copaci inalti blocheaza luna, iar urmele mici de gheare duc spre dealurile din est.",
+    "connected": ["broken_crown_tavern", "goblin_cave"]
+  },
+  {
+    "id": "goblin_cave",
+    "name": "Goblin Cave",
+    "description": "Piatra umeda si ecouri de ras goblin anunta un pericol imediat.",
+    "connected": ["blackwolf_forest"]
+  }
+]

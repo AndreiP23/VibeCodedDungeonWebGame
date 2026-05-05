@@ -1,0 +1,40 @@
+[
+  {
+    "id": "innkeeper_borin",
+    "name": "Borin",
+    "race": "dwarf",
+    "personality": "precaut, prietenos cu cei care ii castiga increderea",
+    "secrets": ["stie locatia comorii ascunse sub taverna"],
+    "speechStyle": "propozitii scurte, ocazional injuraturi piticesti",
+    "location": "Broken Crown Tavern"
+  },
+  {
+    "id": "witch_lyra",
+    "name": "Lyra",
+    "race": "elf",
+    "personality": "calma, criptica, observa orice detaliu",
+    "secrets": ["a vazut urme de magie neagra in padure"],
+    "speechStyle": "fraze poetice, ton misterios",
+    "location": "Blackwolf Forest"
+  },
+  {
+    "id": "captain_aldric",
+    "name": "Captain Aldric",
+    "race": "human",
+    "personality": "disciplinat, suspicios, loial orasului",
+    "secrets": ["a ascuns o patrula disparuta pentru a evita panica"],
+    "speechStyle": "clar, militar, la obiect",
+    "location": "Broken Crown Tavern"
+  },
+  {
+    "id": "grix",
+    "name": "Grix",
+    "race": "goblin",
+    "personality": "violent, viclean, oportunist",
+    "secrets": ["a rapit fiica primarului la ordinul unui necunoscut"],
+    "speechStyle": "taioasa, batjocoritoare",
+    "location": "Goblin Cave",
+    "armorClass": 13,
+    "hp": 24
+  }
+]
