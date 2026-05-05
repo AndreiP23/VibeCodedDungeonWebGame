@@ -26,6 +26,7 @@ export default function GamePage() {
     initGame,
     playerClass,
     playerName,
+    reset,
   } = useGameStore();
 
   useEffect(() => {
@@ -74,8 +75,18 @@ export default function GamePage() {
     <main className="min-h-screen bg-zinc-950 px-3 py-4 text-zinc-100 md:px-5 md:py-6">
       <div className="mx-auto grid h-[calc(100vh-2rem)] max-w-7xl gap-4 md:grid-cols-[7fr_3fr]">
         <Card className="flex h-full flex-col border-zinc-700 bg-zinc-900/80">
-          <CardHeader className="pb-3">
+          <CardHeader className="flex flex-row items-center justify-between pb-3">
             <CardTitle className="text-2xl">Sesiune #{sessionId?.slice(0, 8)}</CardTitle>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => {
+                reset();
+                router.push("/character");
+              }}
+            >
+              New Game
+            </Button>
           </CardHeader>
 
           <CardContent className="flex min-h-0 flex-1 flex-col gap-4">

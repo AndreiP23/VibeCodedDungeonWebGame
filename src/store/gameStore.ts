@@ -18,6 +18,7 @@ interface GameStoreState {
   error: string | null;
   initGame: (playerName: string, playerClass: PlayerClass, sessionId?: string) => Promise<void>;
   playTurn: (message: string) => Promise<void>;
+  reset: () => void;
 }
 
 interface ApiResponse {
@@ -152,4 +153,13 @@ export const useGameStore = create<GameStoreState>((set, get) => ({
       });
     }
   },
+
+  reset: () =>
+    set({
+      sessionId: null,
+      gameState: null,
+      chat: [],
+      latestRolls: [],
+      error: null,
+    }),
 }));
