@@ -88,6 +88,12 @@ export default function GamePage() {
               </div>
             </ScrollArea>
 
+            {loading ? (
+              <p className="text-xs italic text-zinc-400">
+                Dungeon Master gândește<span className="animate-pulse">...</span>
+              </p>
+            ) : null}
+
             <div className="flex flex-wrap gap-2">
               {latestRolls.map((roll, index) => (
                 <DiceRoll key={`${roll.checkType}-${roll.total}-${index}`} roll={roll} />
