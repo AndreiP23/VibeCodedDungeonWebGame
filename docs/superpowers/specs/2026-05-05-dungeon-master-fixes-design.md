@@ -102,18 +102,18 @@ jucătorul este în tavernă; nimic nu împiedică.
 
 ```ts
 if (npc.location !== input.state.player.location) {
-  return `[NPC ${npc.name} nu este în locația curentă (${input.state.player.location}). Reformulează narațiunea.]`;
+  return `[NPC ${npc.name} este în ${npc.location}, jucătorul este în ${input.state.player.location}. NPC-ul nu poate vorbi cu jucătorul acum. Spune-i narativ jucătorului că nu vede pe nimeni cu acel nume aici.]`;
 }
 ```
 
 Tool result-ul ajunge la DM ca răspuns de NPC; DM-ul îl interpretează și
-reformulează. Mecanismul reactiv e suficient.
+reformulează narațiunea conform instrucțiunii.
 
-În `dmPrompt.ts`, adaug în lista de Hard constraints:
+În `dmPrompt.ts`, adaug în lista de Hard constraints (devine #7, după cele 6 existente):
 
 ```
-8. Only call getNPCResponse for NPCs whose location matches the player's current
-   location. Verify state.player.location vs the NPC's listed location before calling.
+7. Only call getNPCResponse for NPCs whose location matches the player's current
+   location. Verify state.player.location against the NPC's listed location before calling.
 ```
 
 ---
