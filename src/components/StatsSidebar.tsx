@@ -68,6 +68,26 @@ export function StatsSidebar({ state }: StatsSidebarProps) {
           )}
         </CardContent>
       </Card>
+
+      <Card>
+        <CardHeader className="pb-3">
+          <CardTitle className="text-lg">Quest-uri terminate</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-2">
+          {state.world.activeQuests.filter((quest) => quest.status === "completed").length === 0 ? (
+            <p className="text-sm text-muted-foreground">Nimic încă.</p>
+          ) : (
+            state.world.activeQuests
+              .filter((quest) => quest.status === "completed")
+              .map((quest) => (
+                <div key={quest.id} className="flex items-center gap-2">
+                  <Badge variant="success">✓</Badge>
+                  <p className="text-sm">{quest.title}</p>
+                </div>
+              ))
+          )}
+        </CardContent>
+      </Card>
     </div>
   );
 }

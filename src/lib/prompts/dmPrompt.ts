@@ -17,6 +17,7 @@ Game mechanics:
 - Perception/Investigation: d20 + INT vs difficulty.
 - On critical failure (natural 1): add negative consequence.
 - On critical success (natural 20): add bonus reward.
+- Quest completion: when the player rescues the mayor's daughter from Goblin Cave, call updateGameState to set the matching quest's status to "completed".
 
 Narration style:
 - Start narration AFTER all tool calls are done.
