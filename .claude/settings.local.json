@@ -1,0 +1,18 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(git add *)",
+      "Bash(git -C F:/DungeonWeb commit -m ' *)",
+      "Bash(git -C F:/DungeonWeb add docs/superpowers/plans/2026-05-05-faza-a-fixes.md)",
+      "Bash(git -C F:/DungeonWeb status)",
+      "Bash(git -C F:/DungeonWeb log --oneline -5)",
+      "Bash(git *)",
+      "Bash(npm run *)",
+      "Bash(npm install *)",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\\\\n\" http://localhost:3000/)",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\\\\n\" http://localhost:3000/character)",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\\\\n\" http://localhost:3000/game)",
+      "Bash(curl -s http://localhost:3000/)"
+    ]
+  }
+}

@@ -192,7 +192,6 @@ export async function runDungeonMasterTurn(
             checkType,
             difficulty: Number(toolUse.input.difficulty ?? 10),
             modifier,
-            seed: `${input.sessionId}:${workingState.shortTermMemory.length}:${input.playerMessage}`,
           });
           diceRolls.push(result);
           toolResults.push({

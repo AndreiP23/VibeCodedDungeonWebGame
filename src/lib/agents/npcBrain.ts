@@ -17,6 +17,10 @@ export async function getNPCResponse(input: NPCResponseInput): Promise<string> {
     return "Nu stiu despre cine vorbesti, strainule.";
   }
 
+  if (npc.location !== input.state.player.location) {
+    return `[NPC ${npc.name} este în ${npc.location}, jucătorul este în ${input.state.player.location}. NPC-ul nu poate vorbi cu jucătorul acum. Spune-i narativ jucătorului că nu vede pe nimeni cu acel nume aici.]`;
+  }
+
   const client = getAnthropicClient();
   const model = getAnthropicModel();
 

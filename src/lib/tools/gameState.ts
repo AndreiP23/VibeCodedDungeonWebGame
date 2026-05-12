@@ -9,6 +9,11 @@ const SESSIONS_PATH = path.join(process.cwd(), "data", "game-sessions.json");
 
 type SessionMap = Record<string, GameState>;
 
+const useMemoryStore =
+  !!process.env.VERCEL || process.env.IN_MEMORY_SESSIONS === "1";
+
+const memorySessions = new Map<string, GameState>();
+
 const CLASS_PRESETS: Record<
   PlayerClass,
   {
@@ -86,6 +91,10 @@ function buildInitialState(playerName: string, playerClass: PlayerClass): GameSt
 }
 
 async function readSessions(): Promise<SessionMap> {
+  if (useMemoryStore) {
+    return Object.fromEntries(memorySessions);
+  }
+
   try {
     const fileContent = await fs.readFile(SESSIONS_PATH, "utf8");
     return JSON.parse(fileContent) as SessionMap;
@@ -95,6 +104,14 @@ async function readSessions(): Promise<SessionMap> {
 }
 
 async function writeSessions(sessions: SessionMap): Promise<void> {
+  if (useMemoryStore) {
+    memorySessions.clear();
+    for (const [key, value] of Object.entries(sessions)) {
+      memorySessions.set(key, value);
+    }
+    return;
+  }
+
   await fs.writeFile(SESSIONS_PATH, JSON.stringify(sessions, null, 2), "utf8");
 }
 
