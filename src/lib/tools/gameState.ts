@@ -3,7 +3,10 @@ import { promises as fs } from "fs";
 import path from "path";
 import locationsData from "../../../data/locations.json";
 import npcsData from "../../../data/npcs.json";
-import { GameState, NPC, PlayerClass, Quest } from "@/lib/game/types";
+import { clampBonuses } from "@/lib/agents/characterReview";
+import { buildAvatarSpec } from "@/lib/tools/avatar";
+import { buildRandomBackstory } from "@/lib/tools/backstory";
+import { GameState, NPC, PlayerBonuses, PlayerClass, Quest } from "@/lib/game/types";
 
 const SESSIONS_PATH = path.join(process.cwd(), "data", "game-sessions.json");
 
@@ -51,18 +54,40 @@ const MAIN_QUEST: Quest = {
   status: "active",
 };
 
-function buildInitialState(playerName: string, playerClass: PlayerClass): GameState {
+interface BuildInitialStateOptions {
+  playerName: string;
+  playerClass: PlayerClass;
+  backstory?: string;
+  bonuses?: PlayerBonuses;
+}
+
+function buildInitialState(options: BuildInitialStateOptions): GameState {
+  const { playerName, playerClass, backstory, bonuses } = options;
   const preset = CLASS_PRESETS[playerClass];
+  const safeBonuses = bonuses ? clampBonuses(bonuses, playerClass) : undefined;
+
+  const stats = { ...preset.stats };
+  if (safeBonuses?.statBonus) {
+    stats[safeBonuses.statBonus.stat] += safeBonuses.statBonus.amount;
+  }
+
+  const inventory = [...preset.inventory, ...(safeBonuses?.items ?? [])];
+  const gold = preset.gold + (safeBonuses?.goldBonus ?? 0);
+  const finalBackstory = backstory?.trim() || buildRandomBackstory(playerClass);
+  const avatar = buildAvatarSpec(playerClass, finalBackstory);
 
   return {
     player: {
       name: playerName,
       class: playerClass,
       hp: { current: preset.hp, max: preset.hp },
-      stats: preset.stats,
-      inventory: [...preset.inventory],
-      gold: preset.gold,
+      stats,
+      inventory,
+      gold,
       location: "Broken Crown Tavern",
+      backstory: finalBackstory,
+      flavorTrait: safeBonuses?.flavorTrait,
+      avatarUrl: avatar.url,
     },
     world: {
       currentScene: (locationsData as Array<{ name: string; description: string }>)[0]
@@ -119,18 +144,28 @@ export async function getOrCreateGameState(options: {
   sessionId?: string;
   playerName: string;
   playerClass: PlayerClass;
-}): Promise<{ sessionId: string; state: GameState }> {
+  backstory?: string;
+  bonuses?: PlayerBonuses;
+}): Promise<{ sessionId: string; state: GameState; created: boolean }> {
   const sessionId = options.sessionId ?? randomUUID();
   const sessions = await readSessions();
+  let created = false;
 
   if (!sessions[sessionId]) {
-    sessions[sessionId] = buildInitialState(options.playerName, options.playerClass);
+    sessions[sessionId] = buildInitialState({
+      playerName: options.playerName,
+      playerClass: options.playerClass,
+      backstory: options.backstory,
+      bonuses: options.bonuses,
+    });
     await writeSessions(sessions);
+    created = true;
   }
 
   return {
     sessionId,
     state: sessions[sessionId],
+    created,
   };
 }
 

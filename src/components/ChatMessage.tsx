@@ -28,7 +28,17 @@ export function ChatMessage({ role, content }: ChatMessageProps) {
       >
         <CardContent className="space-y-2 p-3">
           <Badge variant={isPlayer ? "secondary" : "default"}>{roleLabel[role]}</Badge>
-          <p className={`${role === "dm" ? "italic text-amber-900" : ""}`}>{content}</p>
+          <p
+            className={
+              role === "dm"
+                ? "italic text-amber-900"
+                : role === "npc"
+                  ? "text-sky-900"
+                  : ""
+            }
+          >
+            {content}
+          </p>
         </CardContent>
       </Card>
     </div>

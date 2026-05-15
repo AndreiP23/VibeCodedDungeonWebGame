@@ -39,6 +39,21 @@ export interface MemoryEntry {
   timestamp: string;
 }
 
+export type StatKey = "str" | "dex" | "int" | "cha";
+
+export interface PlayerBonuses {
+  items: string[];
+  statBonus?: { stat: StatKey; amount: number };
+  goldBonus?: number;
+  flavorTrait?: string;
+}
+
+export interface CharacterReviewResult {
+  approved: boolean;
+  verdict: string;
+  bonuses: PlayerBonuses;
+}
+
 export interface GameState {
   player: {
     name: string;
@@ -48,6 +63,9 @@ export interface GameState {
     inventory: string[];
     gold: number;
     location: string;
+    backstory?: string;
+    flavorTrait?: string;
+    avatarUrl?: string;
   };
   world: {
     currentScene: string;

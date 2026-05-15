@@ -6,10 +6,16 @@ import { GameState, DiceRollResult, SkillType } from "@/lib/game/types";
 import { dmSystemPrompt } from "@/lib/prompts/dmPrompt";
 import { getNPCResponse } from "@/lib/agents/npcBrain";
 
+export type TurnEvent =
+  | { type: "narration-delta"; delta: string }
+  | { type: "dice"; roll: DiceRollResult }
+  | { type: "npc"; text: string };
+
 interface DungeonMasterTurnInput {
   sessionId: string;
   state: GameState;
   playerMessage: string;
+  onEvent?: (event: TurnEvent) => void;
 }
 
 interface DungeonMasterTurnOutput {
@@ -30,6 +36,18 @@ function clampNarrationSentences(input: string): string {
   }
 
   return fragments.slice(0, 4).join(" ");
+}
+
+const SKILL_TYPES: readonly SkillType[] = [
+  "Combat",
+  "Stealth",
+  "Persuasion",
+  "Perception",
+  "Athletics",
+];
+
+function coerceSkillType(value: unknown): SkillType {
+  return SKILL_TYPES.includes(value as SkillType) ? (value as SkillType) : "Perception";
 }
 
 function deriveSkillModifier(state: GameState, checkType: SkillType): number {
@@ -65,7 +83,7 @@ export async function runDungeonMasterTurn(
     {
       name: "rollDice",
       description:
-        "Roll deterministic dice for checks or combat. Use this instead of inventing random outcomes.",
+        "Roll dice for checks or combat. Always call this for any action that could fail; never invent an outcome yourself.",
       input_schema: {
         type: "object",
         properties: {
@@ -142,10 +160,10 @@ export async function runDungeonMasterTurn(
     },
   ];
 
-  let finalNarration = "";
+  let accumulatedNarration = "";
 
   for (let iteration = 0; iteration < 6; iteration += 1) {
-    const response = await client.messages.create({
+    const stream = client.messages.stream({
       model,
       max_tokens: 420,
       system: dmSystemPrompt,
@@ -154,15 +172,12 @@ export async function runDungeonMasterTurn(
       tool_choice: { type: "auto" },
     });
 
-    const textOutput = response.content
-      .filter((block) => block.type === "text")
-      .map((block) => block.text)
-      .join("\n")
-      .trim();
+    stream.on("text", (delta: string) => {
+      accumulatedNarration += delta;
+      input.onEvent?.({ type: "narration-delta", delta });
+    });
 
-    if (textOutput) {
-      finalNarration = textOutput;
-    }
+    const response = await stream.finalMessage();
 
     const toolUses = response.content.filter((block) => block.type === "tool_use") as any[];
 
@@ -182,7 +197,7 @@ export async function runDungeonMasterTurn(
     for (const toolUse of toolUses) {
       try {
         if (toolUse.name === "rollDice") {
-          const checkType = String(toolUse.input.checkType ?? "Perception") as SkillType;
+          const checkType = coerceSkillType(toolUse.input.checkType);
           const modifier =
             typeof toolUse.input.modifier === "number"
               ? toolUse.input.modifier
@@ -194,6 +209,7 @@ export async function runDungeonMasterTurn(
             modifier,
           });
           diceRolls.push(result);
+          input.onEvent?.({ type: "dice", roll: result });
           toolResults.push({
             type: "tool_result",
             tool_use_id: toolUse.id,
@@ -222,6 +238,7 @@ export async function runDungeonMasterTurn(
             recentContext: String(toolUse.input.recentContext ?? workingState.world.currentScene),
           });
           npcDialogue = responseText;
+          input.onEvent?.({ type: "npc", text: responseText });
           toolResults.push({
             type: "tool_result",
             tool_use_id: toolUse.id,
@@ -261,7 +278,10 @@ export async function runDungeonMasterTurn(
   }
 
   return {
-    narration: clampNarrationSentences(finalNarration || "Misterul se adanceste, dar drumul inca ti se deschide in fata."),
+    narration: clampNarrationSentences(
+      accumulatedNarration.trim() ||
+        "Misterul se adanceste, dar drumul inca ti se deschide in fata.",
+    ),
     npcDialogue,
     diceRolls,
     state: workingState,

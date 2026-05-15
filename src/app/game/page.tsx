@@ -4,6 +4,7 @@ import { FormEvent, useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { ChatMessage } from "@/components/ChatMessage";
 import { DiceRoll } from "@/components/DiceRoll";
+import { EndStateOverlay } from "@/components/EndStateOverlay";
 import { StatsSidebar } from "@/components/StatsSidebar";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -44,7 +45,7 @@ export default function GamePage() {
         : null;
 
     if (incomingSession) {
-      void initGame(playerName || "Erou", playerClass, incomingSession);
+      void initGame(playerName || "Erou", playerClass, { sessionId: incomingSession });
       return;
     }
 
@@ -71,10 +72,25 @@ export default function GamePage() {
     );
   }
 
+  const isDead = gameState.player.hp.current <= 0;
+  const mainQuestDone = gameState.world.activeQuests.some(
+    (quest) => quest.id === "find-mayor-daughter" && quest.status === "completed",
+  );
+  const endState: "death" | "victory" | null = isDead
+    ? "death"
+    : mainQuestDone
+      ? "victory"
+      : null;
+
+  function handlePlayAgain() {
+    reset();
+    router.push("/character");
+  }
+
   return (
     <main className="min-h-screen bg-zinc-950 px-3 py-4 text-zinc-100 md:px-5 md:py-6">
       <div className="mx-auto grid h-[calc(100vh-2rem)] max-w-7xl gap-4 md:grid-cols-[7fr_3fr]">
-        <Card className="flex h-full flex-col border-zinc-700 bg-zinc-900/80">
+        <Card className="relative flex h-full flex-col border-zinc-700 bg-zinc-900/80">
           <CardHeader className="flex flex-row items-center justify-between pb-3">
             <CardTitle className="text-2xl">Sesiune #{sessionId?.slice(0, 8)}</CardTitle>
             <Button
@@ -115,17 +131,25 @@ export default function GamePage() {
               <input
                 value={message}
                 onChange={(event) => setMessage(event.target.value)}
-                placeholder="Ce faci?"
+                placeholder={endState ? "Aventura s-a incheiat" : "Ce faci?"}
                 className="h-11 flex-1 rounded-md border border-zinc-700 bg-zinc-950 px-3 text-sm"
-                disabled={loading}
+                disabled={loading || endState !== null}
               />
-              <Button type="submit" disabled={loading || !message.trim()}>
+              <Button type="submit" disabled={loading || endState !== null || !message.trim()}>
                 {loading ? "Se joaca..." : "Trimite"}
               </Button>
             </form>
 
             {error ? <p className="text-sm text-red-300">{error}</p> : null}
           </CardContent>
+
+          {endState ? (
+            <EndStateOverlay
+              variant={endState}
+              playerName={gameState.player.name}
+              onPlayAgain={handlePlayAgain}
+            />
+          ) : null}
         </Card>
 
         <aside className="h-full overflow-y-auto">

@@ -1,7 +1,47 @@
+"use client";
+
+import { useEffect, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
 import { GameState } from "@/lib/game/types";
+
+function Avatar({ url, name }: { url: string; name: string }) {
+  const [status, setStatus] = useState<"loading" | "ready" | "error">("loading");
+
+  useEffect(() => {
+    setStatus("loading");
+  }, [url]);
+
+  return (
+    <div className="relative h-14 w-14 flex-shrink-0 overflow-hidden rounded-md border border-zinc-700 bg-zinc-900">
+      {status !== "error" ? (
+        // eslint-disable-next-line @next/next/no-img-element
+        <img
+          src={url}
+          alt={`Portret ${name}`}
+          width={56}
+          height={56}
+          onLoad={() => setStatus("ready")}
+          onError={() => setStatus("error")}
+          className={`h-14 w-14 object-cover transition-opacity duration-500 ${
+            status === "ready" ? "opacity-100" : "opacity-0"
+          }`}
+        />
+      ) : null}
+      {status === "loading" ? (
+        <div className="absolute inset-0 flex items-center justify-center text-xs text-zinc-500">
+          <span className="animate-pulse">…</span>
+        </div>
+      ) : null}
+      {status === "error" ? (
+        <div className="absolute inset-0 flex items-center justify-center text-lg" aria-hidden>
+          🛡️
+        </div>
+      ) : null}
+    </div>
+  );
+}
 
 interface StatsSidebarProps {
   state: GameState;
@@ -18,8 +58,15 @@ export function StatsSidebar({ state }: StatsSidebarProps) {
     <div className="space-y-4">
       <Card>
         <CardHeader className="pb-3">
-          <CardTitle className="text-lg">{state.player.name}</CardTitle>
-          <p className="text-sm capitalize text-muted-foreground">{state.player.class}</p>
+          <div className="flex items-center gap-3">
+            {state.player.avatarUrl ? (
+              <Avatar url={state.player.avatarUrl} name={state.player.name} />
+            ) : null}
+            <div className="min-w-0 flex-1">
+              <CardTitle className="text-lg">{state.player.name}</CardTitle>
+              <p className="text-sm capitalize text-muted-foreground">{state.player.class}</p>
+            </div>
+          </div>
         </CardHeader>
         <CardContent className="space-y-3">
           <div className="space-y-1">
@@ -37,8 +84,26 @@ export function StatsSidebar({ state }: StatsSidebarProps) {
           </div>
           <p className="text-sm font-medium">Aur: {state.player.gold}</p>
           <p className="text-sm">Locatie: {state.player.location}</p>
+          {state.player.flavorTrait ? (
+            <p className="text-xs italic text-muted-foreground">
+              {state.player.flavorTrait}
+            </p>
+          ) : null}
         </CardContent>
       </Card>
+
+      {state.player.backstory ? (
+        <Card>
+          <CardHeader className="pb-3">
+            <CardTitle className="text-lg">Poveste</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p className="whitespace-pre-line text-xs leading-relaxed text-muted-foreground">
+              {state.player.backstory}
+            </p>
+          </CardContent>
+        </Card>
+      ) : null}
 
       <Card>
         <CardHeader className="pb-3">

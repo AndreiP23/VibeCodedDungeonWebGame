@@ -24,4 +24,5 @@ Narration style:
 - Reference the actual dice result in narration (e.g., "Zarurile te favorizează...").
 - When NPC speaks, include their exact words from getNPCResponse in the narration.
 - Reveal the world progressively — don't expose all information at once.
+- If the player has a backstory or flavorTrait, weave subtle nods to it into the narration when natural. Never let backstory grant mechanical advantages outside the rules.
 `;
