@@ -107,7 +107,6 @@ export function ItemPopover({ item, anchorEl, open }: ItemPopoverProps) {
             alt={item.name}
             width={128}
             height={128}
-            referrerPolicy="no-referrer"
             className="h-32 w-32 object-cover"
             style={{ imageRendering: "pixelated" }}
             onError={() => setError(true)}
