@@ -2,7 +2,26 @@
 
 import { useEffect, useState } from "react";
 import { Badge } from "@/components/ui/badge";
-import { GameState } from "@/lib/game/types";
+import { GameState, InventoryItem, ItemRarity } from "@/lib/game/types";
+
+const RARITY_VARIANT: Record<ItemRarity, "secondary" | "success" | "gem-blue" | "gem-purple" | "gold"> = {
+  common: "secondary",
+  uncommon: "success",
+  rare: "gem-blue",
+  epic: "gem-purple",
+  legendary: "gold",
+};
+
+function toItem(entry: unknown): InventoryItem {
+  if (typeof entry === "string") return { name: entry, rarity: "common" };
+  const obj = entry as { name?: unknown; rarity?: unknown };
+  const name = typeof obj?.name === "string" ? obj.name : String(entry ?? "");
+  const validRarities: ItemRarity[] = ["common", "uncommon", "rare", "epic", "legendary"];
+  const rarity = validRarities.includes(obj?.rarity as ItemRarity)
+    ? (obj.rarity as ItemRarity)
+    : "common";
+  return { name, rarity };
+}
 
 function Avatar({ url, name }: { url: string; name: string }) {
   const [status, setStatus] = useState<"loading" | "ready" | "error">("loading");
@@ -113,11 +132,19 @@ export function StatsSidebar({ state }: StatsSidebarProps) {
           <p className="text-text-dim text-base">Empty</p>
         ) : (
           <div className="grid grid-cols-2 gap-2">
-            {state.player.inventory.map((item) => (
-              <Badge variant="secondary" key={item} className="justify-center">
-                {item}
-              </Badge>
-            ))}
+            {state.player.inventory.map((entry, idx) => {
+              const item = toItem(entry);
+              return (
+                <Badge
+                  variant={RARITY_VARIANT[item.rarity]}
+                  key={`${item.name}-${idx}`}
+                  className="justify-center"
+                  title={item.rarity}
+                >
+                  {item.name}
+                </Badge>
+              );
+            })}
           </div>
         )}
       </SidebarPanel>

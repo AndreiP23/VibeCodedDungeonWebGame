@@ -6,7 +6,15 @@ import npcsData from "../../../data/npcs.json";
 import { clampBonuses } from "@/lib/agents/characterReview";
 import { buildAvatarSpec } from "@/lib/tools/avatar";
 import { buildRandomBackstory } from "@/lib/tools/backstory";
-import { GameState, NPC, PlayerBonuses, PlayerClass, Quest } from "@/lib/game/types";
+import {
+  GameState,
+  InventoryItem,
+  ItemRarity,
+  NPC,
+  PlayerBonuses,
+  PlayerClass,
+  Quest,
+} from "@/lib/game/types";
 
 const SESSIONS_PATH = path.join(process.cwd(), "data", "game-sessions.json");
 
@@ -22,29 +30,74 @@ const CLASS_PRESETS: Record<
   {
     hp: number;
     stats: { str: number; dex: number; int: number; cha: number };
-    inventory: string[];
+    inventory: InventoryItem[];
     gold: number;
   }
 > = {
   warrior: {
     hp: 26,
     stats: { str: 4, dex: 1, int: 0, cha: 1 },
-    inventory: ["longsword", "shield", "torch"],
+    inventory: [
+      { name: "longsword", rarity: "uncommon" },
+      { name: "shield", rarity: "common" },
+      { name: "torch", rarity: "common" },
+    ],
     gold: 12,
   },
   mage: {
     hp: 18,
     stats: { str: 0, dex: 1, int: 4, cha: 2 },
-    inventory: ["oak staff", "spellbook", "mana crystal"],
+    inventory: [
+      { name: "oak staff", rarity: "uncommon" },
+      { name: "spellbook", rarity: "rare" },
+      { name: "mana crystal", rarity: "uncommon" },
+    ],
     gold: 14,
   },
   rogue: {
     hp: 20,
     stats: { str: 1, dex: 4, int: 1, cha: 2 },
-    inventory: ["dagger", "lockpick set", "smoke vial"],
+    inventory: [
+      { name: "dagger", rarity: "common" },
+      { name: "lockpick set", rarity: "uncommon" },
+      { name: "smoke vial", rarity: "uncommon" },
+    ],
     gold: 16,
   },
 };
+
+const VALID_RARITIES: readonly ItemRarity[] = [
+  "common",
+  "uncommon",
+  "rare",
+  "epic",
+  "legendary",
+];
+
+export function normalizeInventoryItem(raw: unknown): InventoryItem | null {
+  if (typeof raw === "string") {
+    const name = raw.trim();
+    if (!name) return null;
+    return { name, rarity: "common" };
+  }
+  if (raw && typeof raw === "object") {
+    const obj = raw as { name?: unknown; rarity?: unknown };
+    const name = typeof obj.name === "string" ? obj.name.trim() : "";
+    if (!name) return null;
+    const rarity = VALID_RARITIES.includes(obj.rarity as ItemRarity)
+      ? (obj.rarity as ItemRarity)
+      : "common";
+    return { name, rarity };
+  }
+  return null;
+}
+
+function normalizeInventory(raw: unknown): InventoryItem[] {
+  if (!Array.isArray(raw)) return [];
+  return raw
+    .map((entry) => normalizeInventoryItem(entry))
+    .filter((entry): entry is InventoryItem => entry !== null);
+}
 
 const MAIN_QUEST: Quest = {
   id: "find-mayor-daughter",
@@ -71,7 +124,11 @@ function buildInitialState(options: BuildInitialStateOptions): GameState {
     stats[safeBonuses.statBonus.stat] += safeBonuses.statBonus.amount;
   }
 
-  const inventory = [...preset.inventory, ...(safeBonuses?.items ?? [])];
+  const bonusItems: InventoryItem[] = (safeBonuses?.items ?? []).map((name) => ({
+    name,
+    rarity: "common" as ItemRarity,
+  }));
+  const inventory: InventoryItem[] = [...preset.inventory, ...bonusItems];
   const gold = preset.gold + (safeBonuses?.goldBonus ?? 0);
   const finalBackstory = backstory?.trim() || buildRandomBackstory(playerClass);
   const avatar = buildAvatarSpec(playerClass, finalBackstory);
@@ -194,7 +251,9 @@ export async function updateGameState(
         ...currentState.player.stats,
         ...(changes.player?.stats ?? {}),
       },
-      inventory: changes.player?.inventory ?? currentState.player.inventory,
+      inventory: changes.player?.inventory
+        ? normalizeInventory(changes.player.inventory)
+        : normalizeInventory(currentState.player.inventory),
     },
     world: {
       ...currentState.world,

@@ -45,6 +45,13 @@ export interface MemoryEntry {
 
 export type StatKey = "str" | "dex" | "int" | "cha";
 
+export type ItemRarity = "common" | "uncommon" | "rare" | "epic" | "legendary";
+
+export interface InventoryItem {
+  name: string;
+  rarity: ItemRarity;
+}
+
 export interface PlayerBonuses {
   items: string[];
   statBonus?: { stat: StatKey; amount: number };
@@ -64,7 +71,7 @@ export interface GameState {
     class: PlayerClass;
     hp: { current: number; max: number };
     stats: { str: number; dex: number; int: number; cha: number };
-    inventory: string[];
+    inventory: InventoryItem[];
     gold: number;
     location: string;
     backstory?: string;
