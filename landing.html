@@ -1,0 +1,1035 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DungeonScroll — The AI Text RPG</title>
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --bg:#06060f;
+  --sky:#0d1b3e;
+  --dirt:#5c3a1e;
+  --dirt2:#4a2e16;
+  --dirt3:#3d2410;
+  --stone:#5a5a5a;
+  --stone2:#484848;
+  --torch:#ff9d00;
+  --torch2:#ffcc44;
+  --fire:#ff4500;
+  --gold:#ffd700;
+  --green:#3cb371;
+  --gem-blue:#00cfff;
+  --gem-red:#ff3355;
+  --gem-purple:#bb44ff;
+  --gem-green:#44ff99;
+  --text:#ffe4b5;
+  --text-dim:#c4a882;
+  --hp:#e74c3c;
+  --mp:#3498db;
+  --xp:#2ecc71;
+  --pixel:'Press Start 2P',monospace;
+  --term:'VT323',monospace;
+}
+html{scroll-behavior:smooth}
+body{
+  background:var(--bg);
+  color:var(--text);
+  font-family:var(--pixel);
+  overflow-x:hidden;
+  cursor:default;
+}
+
+/* ── SCROLLBAR ── */
+::-webkit-scrollbar{width:8px}
+::-webkit-scrollbar-track{background:#111}
+::-webkit-scrollbar-thumb{background:var(--dirt);image-rendering:pixelated}
+
+/* ── NAV ── */
+nav{
+  position:fixed;top:0;left:0;right:0;z-index:100;
+  display:flex;align-items:center;justify-content:space-between;
+  padding:14px 40px;
+  background:rgba(6,6,15,0.92);
+  border-bottom:3px solid var(--dirt2);
+  backdrop-filter:blur(4px);
+}
+.logo{
+  font-size:12px;color:var(--torch);letter-spacing:2px;
+  text-shadow:0 0 12px var(--torch),0 0 24px rgba(255,157,0,0.4);
+}
+.logo span{color:var(--torch2)}
+.nav-links{display:flex;gap:28px}
+.nav-links a{
+  font-size:8px;color:var(--text-dim);text-decoration:none;
+  letter-spacing:1px;transition:color .2s;
+}
+.nav-links a:hover{color:var(--torch)}
+.nav-cta{
+  font-family:var(--pixel);font-size:8px;
+  background:var(--torch);color:#000;border:none;
+  padding:10px 18px;cursor:pointer;
+  image-rendering:pixelated;
+  box-shadow:3px 3px 0 #7a3e00;
+  transition:transform .1s,box-shadow .1s;
+  letter-spacing:1px;
+}
+.nav-cta:hover{transform:translate(-1px,-1px);box-shadow:4px 4px 0 #7a3e00}
+.nav-cta:active{transform:translate(1px,1px);box-shadow:2px 2px 0 #7a3e00}
+
+/* ── STARS ── */
+#stars{position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:0}
+
+/* ── HERO ── */
+.hero{
+  position:relative;
+  min-height:100vh;
+  display:flex;flex-direction:column;
+  align-items:center;justify-content:center;
+  overflow:hidden;
+  padding:0 20px;
+}
+.hero-sky{
+  position:absolute;inset:0;
+  background:linear-gradient(180deg,#02020a 0%,#060d22 40%,#0d1b3e 70%,#1a2a1a 85%,#1a3310 90%,#2a4a18 95%,#3a6020 100%);
+}
+/* pixel terrain strip */
+.terrain{
+  position:absolute;bottom:0;left:0;right:0;
+  height:220px;
+}
+.terrain-grass{
+  position:absolute;bottom:160px;left:0;right:0;height:16px;
+  background:repeating-linear-gradient(90deg,#3cb371 0px,#3cb371 14px,#2eaa62 14px,#2eaa62 16px);
+  image-rendering:pixelated;
+}
+.terrain-dirt{
+  position:absolute;bottom:48px;left:0;right:0;height:112px;
+  background:
+    repeating-linear-gradient(0deg,transparent 0px,transparent 15px,rgba(0,0,0,0.15) 15px,rgba(0,0,0,0.15) 16px),
+    repeating-linear-gradient(90deg,transparent 0px,transparent 15px,rgba(0,0,0,0.1) 15px,rgba(0,0,0,0.1) 16px),
+    var(--dirt);
+}
+.terrain-stone{
+  position:absolute;bottom:0;left:0;right:0;height:64px;
+  background:
+    repeating-linear-gradient(0deg,transparent 0px,transparent 15px,rgba(0,0,0,0.2) 15px,rgba(0,0,0,0.2) 16px),
+    repeating-linear-gradient(90deg,transparent 0px,transparent 15px,rgba(0,0,0,0.15) 15px,rgba(0,0,0,0.15) 16px),
+    var(--stone);
+}
+/* pixel trees */
+.pixel-tree{position:absolute;bottom:175px;image-rendering:pixelated}
+
+/* torch glow spots */
+.torch-spot{
+  position:absolute;
+  width:6px;height:20px;
+  background:linear-gradient(180deg,var(--torch2),var(--torch),var(--dirt));
+}
+.torch-spot::before{
+  content:'';position:absolute;top:-10px;left:50%;transform:translateX(-50%);
+  width:8px;height:12px;
+  background:radial-gradient(ellipse,var(--torch2) 0%,var(--torch) 40%,transparent 100%);
+  animation:flicker 1.5s ease-in-out infinite;
+}
+.torch-glow{
+  position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
+  width:120px;height:120px;
+  border-radius:50%;
+  background:radial-gradient(ellipse,rgba(255,157,0,0.18) 0%,rgba(255,157,0,0.05) 50%,transparent 70%);
+  animation:glow-pulse 2s ease-in-out infinite;
+  pointer-events:none;
+}
+@keyframes flicker{
+  0%,100%{transform:translateX(-50%) scaleX(1) scaleY(1)}
+  25%{transform:translateX(-48%) scaleX(0.9) scaleY(1.1)}
+  50%{transform:translateX(-52%) scaleX(1.1) scaleY(0.9)}
+  75%{transform:translateX(-49%) scaleX(0.95) scaleY(1.05)}
+}
+@keyframes glow-pulse{
+  0%,100%{opacity:.7;transform:translate(-50%,-50%) scale(1)}
+  50%{opacity:1;transform:translate(-50%,-50%) scale(1.15)}
+}
+
+/* hero content */
+.hero-content{
+  position:relative;z-index:2;
+  text-align:center;margin-top:-80px;
+}
+.hero-badge{
+  display:inline-block;
+  font-size:7px;
+  background:rgba(255,157,0,0.15);
+  border:1px solid rgba(255,157,0,0.4);
+  color:var(--torch);padding:8px 16px;
+  letter-spacing:2px;margin-bottom:24px;
+  animation:badge-float 3s ease-in-out infinite;
+}
+@keyframes badge-float{
+  0%,100%{transform:translateY(0)}50%{transform:translateY(-4px)}
+}
+.hero-title{
+  font-size:clamp(24px,5vw,52px);
+  line-height:1.5;
+  color:#fff;
+  text-shadow:
+    0 0 20px rgba(255,157,0,0.6),
+    0 0 40px rgba(255,157,0,0.3),
+    4px 4px 0 rgba(0,0,0,0.8);
+  margin-bottom:8px;
+  animation:title-in 1s ease-out both;
+}
+.hero-title .orange{color:var(--torch)}
+.hero-title .gold{color:var(--gold)}
+@keyframes title-in{
+  from{opacity:0;transform:translateY(-20px)}
+  to{opacity:1;transform:translateY(0)}
+}
+.hero-sub{
+  font-size:clamp(14px,2.5vw,22px);
+  font-family:var(--term);
+  color:var(--text-dim);letter-spacing:3px;
+  margin-bottom:40px;
+  animation:title-in 1s .3s ease-out both;
+}
+.hero-buttons{
+  display:flex;gap:16px;justify-content:center;flex-wrap:wrap;
+  animation:title-in 1s .6s ease-out both;
+}
+.btn-primary{
+  font-family:var(--pixel);font-size:9px;letter-spacing:1px;
+  background:var(--torch);color:#000;border:none;
+  padding:16px 28px;cursor:pointer;
+  box-shadow:4px 4px 0 #7a3e00,0 0 20px rgba(255,157,0,0.4);
+  transition:transform .1s,box-shadow .1s;
+}
+.btn-primary:hover{transform:translate(-2px,-2px);box-shadow:6px 6px 0 #7a3e00,0 0 30px rgba(255,157,0,0.6)}
+.btn-primary:active{transform:translate(1px,1px);box-shadow:2px 2px 0 #7a3e00}
+.btn-secondary{
+  font-family:var(--pixel);font-size:9px;letter-spacing:1px;
+  background:transparent;color:var(--text);
+  border:2px solid var(--stone);
+  padding:14px 26px;cursor:pointer;
+  box-shadow:4px 4px 0 #222;
+  transition:transform .1s,box-shadow .1s,border-color .2s,color .2s;
+}
+.btn-secondary:hover{border-color:var(--torch);color:var(--torch);transform:translate(-2px,-2px);box-shadow:6px 6px 0 #111}
+/* scroll hint */
+.scroll-hint{
+  position:absolute;bottom:30px;left:50%;transform:translateX(-50%);
+  font-size:7px;color:var(--text-dim);letter-spacing:2px;
+  animation:bounce 2s ease-in-out infinite;z-index:2;
+}
+@keyframes bounce{0%,100%{transform:translateX(-50%) translateY(0)}50%{transform:translateX(-50%) translateY(6px)}}
+.scroll-hint::after{content:'▼';display:block;text-align:center;margin-top:4px;color:var(--torch)}
+
+/* ── SECTION SHARED ── */
+section{position:relative;z-index:1;padding:80px 40px}
+.section-label{font-size:7px;color:var(--torch);letter-spacing:3px;text-align:center;margin-bottom:12px}
+.section-title{font-size:clamp(16px,3vw,28px);text-align:center;color:#fff;margin-bottom:12px;line-height:1.6}
+.section-sub{font-family:var(--term);font-size:clamp(16px,2vw,20px);color:var(--text-dim);text-align:center;margin-bottom:60px;letter-spacing:2px}
+
+/* pixel divider */
+.pixel-divider{
+  height:16px;
+  background:repeating-linear-gradient(90deg,var(--dirt3) 0px,var(--dirt3) 16px,var(--dirt2) 16px,var(--dirt2) 32px);
+  border-top:3px solid var(--dirt);border-bottom:3px solid var(--dirt3);
+}
+
+/* ── FEATURES ── */
+.features-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(260px,1fr));
+  gap:24px;max-width:1100px;margin:0 auto;
+}
+.feature-card{
+  background:#0e0e1e;
+  border:2px solid var(--dirt2);
+  padding:32px 24px;
+  position:relative;overflow:hidden;
+  transition:transform .2s,border-color .2s,box-shadow .2s;
+}
+.feature-card::before{
+  content:'';position:absolute;inset:0;
+  background:linear-gradient(135deg,rgba(255,157,0,0.04) 0%,transparent 60%);
+}
+.feature-card:hover{
+  transform:translateY(-4px);
+  border-color:var(--torch);
+  box-shadow:0 8px 32px rgba(255,157,0,0.15);
+}
+.feature-icon{
+  width:56px;height:56px;
+  background:rgba(255,157,0,0.12);
+  border:2px solid rgba(255,157,0,0.3);
+  display:flex;align-items:center;justify-content:center;
+  font-size:24px;margin-bottom:20px;
+  image-rendering:pixelated;
+}
+.feature-card h3{font-size:11px;color:var(--torch);margin-bottom:16px;line-height:1.6}
+.feature-card p{font-family:var(--term);font-size:18px;color:var(--text-dim);line-height:1.6;letter-spacing:1px}
+.feature-tag{
+  display:inline-block;margin-top:16px;
+  font-size:7px;padding:4px 10px;
+  background:rgba(255,157,0,0.1);
+  border:1px solid rgba(255,157,0,0.25);
+  color:var(--torch);letter-spacing:1px;
+}
+
+/* ── TERMINAL DEMO ── */
+.demo-wrap{
+  max-width:900px;margin:0 auto;
+  border:3px solid var(--dirt);
+  background:#080810;
+  position:relative;
+}
+.demo-titlebar{
+  background:var(--dirt2);padding:10px 16px;
+  display:flex;align-items:center;gap:10px;
+  border-bottom:2px solid var(--dirt3);
+}
+.demo-dot{width:12px;height:12px;border:2px solid}
+.demo-dot.red{border-color:#e74c3c;background:rgba(231,76,60,0.3)}
+.demo-dot.yellow{border-color:#f39c12;background:rgba(243,156,18,0.3)}
+.demo-dot.green{border-color:#2ecc71;background:rgba(46,204,113,0.3)}
+.demo-titlebar-txt{font-size:8px;color:var(--text-dim);margin-left:8px;letter-spacing:2px}
+.demo-body{
+  display:grid;grid-template-columns:1fr 280px;
+  min-height:420px;
+}
+.demo-terminal{
+  padding:24px;font-family:var(--term);font-size:19px;
+  line-height:1.7;border-right:2px solid var(--dirt2);
+  overflow-y:auto;max-height:420px;
+}
+.demo-terminal .sys{color:#666;font-size:15px}
+.demo-terminal .narrate{color:var(--text)}
+.demo-terminal .input-line{color:var(--torch2)}
+.demo-terminal .result{color:var(--gem-green)}
+.demo-terminal .damage{color:var(--hp)}
+.demo-terminal .item{color:var(--gem-blue)}
+.demo-terminal .dice-roll{color:var(--gold);font-size:16px}
+.cursor{
+  display:inline-block;width:10px;height:18px;
+  background:var(--torch);vertical-align:middle;
+  animation:blink .8s step-end infinite;
+}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:0}}
+
+/* stats panel */
+.demo-stats{padding:20px 16px;display:flex;flex-direction:column;gap:16px}
+.stat-block h4{font-size:8px;color:var(--text-dim);margin-bottom:8px;letter-spacing:1px}
+.stat-bar-wrap{display:flex;align-items:center;gap:8px;margin-bottom:6px}
+.stat-bar-label{font-size:7px;width:30px;color:var(--text-dim)}
+.stat-bar-outer{flex:1;height:10px;background:#1a1a2a;border:1px solid #333}
+.stat-bar-inner{height:100%;image-rendering:pixelated;transition:width 1s}
+.stat-val{font-size:7px;color:var(--text-dim);width:36px;text-align:right}
+
+.inventory-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:4px;margin-top:6px}
+.inv-slot{
+  aspect-ratio:1;border:2px solid #333;
+  background:#0d0d1f;
+  display:flex;align-items:center;justify-content:center;
+  font-size:16px;cursor:default;
+  transition:border-color .2s;position:relative;
+}
+.inv-slot:hover{border-color:var(--torch)}
+.inv-slot.filled{border-color:#444}
+.inv-slot .inv-count{
+  position:absolute;bottom:1px;right:3px;
+  font-family:var(--pixel);font-size:6px;color:var(--gold);
+}
+
+.mini-dice{
+  display:flex;gap:6px;flex-wrap:wrap;margin-top:6px;
+}
+.die{
+  width:28px;height:28px;border:2px solid var(--stone);
+  display:flex;align-items:center;justify-content:center;
+  font-size:11px;background:#111;
+  cursor:pointer;
+  transition:transform .1s,border-color .2s;
+}
+.die:hover{border-color:var(--torch);transform:rotate(-5deg) scale(1.1)}
+.die.rolling{animation:die-roll .4s ease-out}
+@keyframes die-roll{
+  0%{transform:rotate(0) scale(1)}
+  25%{transform:rotate(-15deg) scale(0.9)}
+  50%{transform:rotate(15deg) scale(1.1)}
+  75%{transform:rotate(-10deg) scale(0.95)}
+  100%{transform:rotate(0) scale(1)}
+}
+
+/* demo input */
+.demo-input-row{
+  border-top:2px solid var(--dirt2);
+  padding:12px 16px;
+  display:flex;align-items:center;gap:10px;
+  background:#060610;
+}
+.demo-prompt{font-family:var(--term);font-size:18px;color:var(--torch);white-space:nowrap}
+.demo-input{
+  flex:1;font-family:var(--term);font-size:18px;
+  background:transparent;border:none;outline:none;
+  color:var(--torch2);caret-color:var(--torch);
+}
+.demo-input::placeholder{color:#333}
+.demo-send{
+  font-family:var(--pixel);font-size:7px;
+  background:var(--torch);color:#000;border:none;
+  padding:8px 12px;cursor:pointer;
+  box-shadow:2px 2px 0 #7a3e00;
+  transition:transform .1s;
+}
+.demo-send:hover{transform:translate(-1px,-1px)}
+
+/* ── HOW IT WORKS ── */
+.how-grid{
+  max-width:1000px;margin:0 auto;
+  display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));
+  gap:0;position:relative;
+}
+.how-grid::after{
+  content:'';
+  position:absolute;top:40px;left:10%;right:10%;height:2px;
+  background:repeating-linear-gradient(90deg,var(--dirt2) 0px,var(--dirt2) 12px,transparent 12px,transparent 18px);
+  z-index:0;
+}
+.how-step{
+  position:relative;z-index:1;
+  text-align:center;padding:0 20px;
+}
+.step-num{
+  width:80px;height:80px;margin:0 auto 20px;
+  background:var(--dirt2);border:3px solid var(--dirt);
+  display:flex;align-items:center;justify-content:center;
+  font-size:18px;
+  box-shadow:4px 4px 0 #1a0d06;
+  position:relative;
+}
+.step-num::after{
+  content:'';position:absolute;inset:-6px;border:2px dashed rgba(255,157,0,0.2);
+}
+.how-step h3{font-size:9px;color:var(--torch);margin-bottom:12px;line-height:1.6}
+.how-step p{font-family:var(--term);font-size:17px;color:var(--text-dim);line-height:1.5}
+
+/* ── ITEMS SHOWCASE ── */
+.items-row{
+  display:flex;flex-wrap:wrap;justify-content:center;gap:20px;
+  max-width:1000px;margin:0 auto;
+}
+.item-card{
+  background:#0d0d1f;border:2px solid #2a2a3a;
+  padding:20px;width:180px;text-align:center;
+  transition:transform .2s,border-color .2s,box-shadow .2s;
+  cursor:default;
+}
+.item-card:hover{transform:translateY(-6px);box-shadow:0 12px 30px rgba(0,0,0,0.5)}
+.item-card.common:hover{border-color:#aaa}
+.item-card.uncommon:hover{border-color:var(--gem-green)}
+.item-card.rare:hover{border-color:var(--gem-blue)}
+.item-card.epic:hover{border-color:var(--gem-purple)}
+.item-card.legendary:hover{border-color:var(--gold)}
+.item-emoji{font-size:36px;display:block;margin-bottom:12px;image-rendering:pixelated}
+.item-name{font-size:8px;line-height:1.5;margin-bottom:6px}
+.item-card.common .item-name{color:#aaa}
+.item-card.uncommon .item-name{color:var(--gem-green)}
+.item-card.rare .item-name{color:var(--gem-blue)}
+.item-card.epic .item-name{color:var(--gem-purple)}
+.item-card.legendary .item-name{color:var(--gold)}
+.item-stat{font-family:var(--term);font-size:15px;color:var(--text-dim)}
+.item-rarity{font-size:6px;letter-spacing:2px;margin-top:6px;padding:3px 8px;display:inline-block}
+.item-card.common .item-rarity{color:#888;border:1px solid #444}
+.item-card.uncommon .item-rarity{color:var(--gem-green);border:1px solid rgba(68,255,153,0.3)}
+.item-card.rare .item-rarity{color:var(--gem-blue);border:1px solid rgba(0,207,255,0.3)}
+.item-card.epic .item-rarity{color:var(--gem-purple);border:1px solid rgba(187,68,255,0.3)}
+.item-card.legendary .item-rarity{color:var(--gold);border:1px solid rgba(255,215,0,0.3);text-shadow:0 0 8px rgba(255,215,0,0.5)}
+
+/* ── DICE SECTION ── */
+.dice-section{background:#09090f;padding:60px 40px}
+.dice-big-wrap{display:flex;flex-wrap:wrap;justify-content:center;gap:24px;margin-top:40px}
+.dice-big{
+  width:100px;height:100px;
+  border:3px solid var(--stone);
+  background:#111;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  cursor:pointer;
+  transition:transform .15s,border-color .2s,box-shadow .2s;
+  position:relative;
+  user-select:none;
+}
+.dice-big:hover{
+  border-color:var(--torch);
+  box-shadow:0 0 20px rgba(255,157,0,0.25),4px 4px 0 #333;
+  transform:translate(-2px,-2px);
+}
+.dice-big:active{transform:translate(0,0);box-shadow:0 0 10px rgba(255,157,0,0.1),2px 2px 0 #333}
+.dice-big .d-label{font-size:8px;color:var(--text-dim);margin-bottom:4px}
+.dice-big .d-result{font-size:28px;color:var(--gold);min-height:36px;display:flex;align-items:center;justify-content:center}
+.dice-big.crit .d-result{color:var(--gem-green);text-shadow:0 0 10px var(--gem-green)}
+.dice-big.fail .d-result{color:var(--hp);text-shadow:0 0 10px var(--hp)}
+.dice-big .d-sides{font-size:7px;color:#555}
+.dice-hint{font-family:var(--term);font-size:18px;color:var(--text-dim);text-align:center;margin-top:20px;letter-spacing:2px}
+
+/* ── CTA ── */
+.cta-section{
+  text-align:center;padding:100px 40px;
+  background:
+    radial-gradient(ellipse 60% 50% at 50% 50%, rgba(255,157,0,0.08) 0%, transparent 70%),
+    #06060f;
+  position:relative;overflow:hidden;
+}
+.cta-section::before{
+  content:'';position:absolute;
+  bottom:0;left:0;right:0;height:3px;
+  background:repeating-linear-gradient(90deg,var(--dirt) 0,var(--dirt) 8px,var(--dirt2) 8px,var(--dirt2) 16px);
+}
+.cta-title{font-size:clamp(18px,3.5vw,36px);color:#fff;margin-bottom:16px;line-height:1.6}
+.cta-sub{font-family:var(--term);font-size:22px;color:var(--text-dim);margin-bottom:48px;letter-spacing:2px}
+.cta-buttons{display:flex;gap:16px;justify-content:center;flex-wrap:wrap}
+.cta-note{font-family:var(--term);font-size:16px;color:var(--text-dim);margin-top:28px;letter-spacing:2px}
+
+/* ── FOOTER ── */
+footer{
+  background:#05050e;
+  border-top:3px solid var(--dirt2);
+  padding:40px;
+  display:flex;flex-direction:column;align-items:center;gap:16px;
+}
+.footer-logo{font-size:11px;color:var(--torch);letter-spacing:2px}
+.footer-logo span{color:var(--torch2)}
+.footer-links{display:flex;gap:24px;flex-wrap:wrap;justify-content:center}
+.footer-links a{font-size:7px;color:var(--text-dim);text-decoration:none;letter-spacing:1px;transition:color .2s}
+.footer-links a:hover{color:var(--torch)}
+.footer-copy{font-family:var(--term);font-size:14px;color:#333;letter-spacing:2px}
+
+/* pixel gem decorations */
+.gem{
+  position:absolute;
+  animation:gem-twinkle 3s ease-in-out infinite;
+}
+@keyframes gem-twinkle{
+  0%,100%{opacity:.4;transform:scale(1)}
+  50%{opacity:1;transform:scale(1.2)}
+}
+
+/* fade-in on scroll */
+.reveal{opacity:0;transform:translateY(20px);transition:opacity .6s,transform .6s}
+.reveal.visible{opacity:1;transform:translateY(0)}
+</style>
+</head>
+<body>
+
+<!-- STARS CANVAS -->
+<canvas id="stars"></canvas>
+
+<!-- NAV -->
+<nav>
+  <div class="logo">Dungeon<span>Scroll</span></div>
+  <div class="nav-links">
+    <a href="#features">Features</a>
+    <a href="#demo">Play Demo</a>
+    <a href="#items">Items</a>
+    <a href="#dice">Dice</a>
+  </div>
+  <button class="nav-cta" onclick="document.getElementById('demo').scrollIntoView({behavior:'smooth'})">▶ PLAY NOW</button>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-sky"></div>
+  <div class="terrain">
+    <div class="terrain-grass"></div>
+    <div class="terrain-dirt"></div>
+    <div class="terrain-stone"></div>
+    <!-- pixel trees (CSS boxes) -->
+    <div style="position:absolute;bottom:175px;left:8%;image-rendering:pixelated">
+      <div style="width:48px;height:64px;background:#2d5a1e;margin:0 auto"></div>
+      <div style="width:16px;height:32px;background:#3d2410;margin:0 auto"></div>
+    </div>
+    <div style="position:absolute;bottom:175px;left:16%;image-rendering:pixelated">
+      <div style="width:32px;height:48px;background:#3cb371;margin:0 auto"></div>
+      <div style="width:12px;height:24px;background:#3d2410;margin:0 auto"></div>
+    </div>
+    <div style="position:absolute;bottom:175px;right:12%;image-rendering:pixelated">
+      <div style="width:56px;height:72px;background:#2d5a1e;margin:0 auto"></div>
+      <div style="width:16px;height:28px;background:#3d2410;margin:0 auto"></div>
+    </div>
+    <div style="position:absolute;bottom:175px;right:22%;image-rendering:pixelated">
+      <div style="width:36px;height:52px;background:#4caf50;margin:0 auto"></div>
+      <div style="width:12px;height:20px;background:#3d2410;margin:0 auto"></div>
+    </div>
+    <!-- torches -->
+    <div style="position:absolute;bottom:176px;left:40%;image-rendering:pixelated">
+      <div style="width:6px;height:18px;background:linear-gradient(#ffd700,#ff9d00,#5c3a1e);margin:0 auto;position:relative">
+        <div style="position:absolute;top:-14px;left:50%;transform:translateX(-50%);width:10px;height:14px;background:radial-gradient(ellipse,#ffd700,#ff4500,transparent);animation:flicker 1.3s ease-in-out infinite"></div>
+      </div>
+      <div style="position:absolute;top:-60px;left:50%;transform:translateX(-50%);width:100px;height:100px;border-radius:50%;background:radial-gradient(ellipse,rgba(255,157,0,0.2),transparent 70%);animation:glow-pulse 2s ease-in-out infinite;pointer-events:none"></div>
+    </div>
+    <div style="position:absolute;bottom:176px;right:38%;image-rendering:pixelated">
+      <div style="width:6px;height:18px;background:linear-gradient(#ffd700,#ff9d00,#5c3a1e);margin:0 auto;position:relative">
+        <div style="position:absolute;top:-14px;left:50%;transform:translateX(-50%);width:10px;height:14px;background:radial-gradient(ellipse,#ffd700,#ff4500,transparent);animation:flicker 1.7s ease-in-out infinite"></div>
+      </div>
+      <div style="position:absolute;top:-60px;left:50%;transform:translateX(-50%);width:100px;height:100px;border-radius:50%;background:radial-gradient(ellipse,rgba(255,157,0,0.2),transparent 70%);animation:glow-pulse 2.5s ease-in-out infinite;pointer-events:none"></div>
+    </div>
+    <!-- gem decorations in stone -->
+    <div style="position:absolute;bottom:20px;left:30%;width:10px;height:10px;background:#00cfff;box-shadow:0 0 8px #00cfff"></div>
+    <div style="position:absolute;bottom:35px;left:55%;width:8px;height:8px;background:#bb44ff;box-shadow:0 0 8px #bb44ff"></div>
+    <div style="position:absolute;bottom:15px;right:25%;width:10px;height:10px;background:#ff3355;box-shadow:0 0 8px #ff3355"></div>
+    <div style="position:absolute;bottom:28px;left:70%;width:8px;height:8px;background:#44ff99;box-shadow:0 0 8px #44ff99"></div>
+  </div>
+
+  <div class="hero-content">
+    <div class="hero-badge">🎲 AI-POWERED TEXT RPG</div>
+    <h1 class="hero-title">DUNGEON<span class="orange">SCROLL</span></h1>
+    <p class="hero-sub">TYPE YOUR DESTINY. ROLL THE DICE. CLAIM YOUR LOOT.</p>
+    <div class="hero-buttons">
+      <button class="btn-primary" onclick="document.getElementById('demo').scrollIntoView({behavior:'smooth'})">⚔ START ADVENTURE</button>
+      <button class="btn-secondary" onclick="document.getElementById('features').scrollIntoView({behavior:'smooth'})">📜 LEARN MORE</button>
+    </div>
+  </div>
+  <div class="scroll-hint">SCROLL TO EXPLORE</div>
+</section>
+
+<div class="pixel-divider"></div>
+
+<!-- FEATURES -->
+<section id="features" style="background:#07070f;padding:80px 40px">
+  <p class="section-label reveal">✦ WHAT AWAITS YOU ✦</p>
+  <h2 class="section-title reveal">YOUR ADVENTURE. YOUR WORDS.</h2>
+  <p class="section-sub reveal">An AI Dungeon Master that never sleeps, never cheats, and always surprises.</p>
+  <div class="features-grid">
+    <div class="feature-card reveal">
+      <div class="feature-icon">⚔️</div>
+      <h3>INFINITE QUESTS</h3>
+      <p>Type anything. Fight anything. Every decision shapes a living, breathing world powered by Agentic AI. No two playthroughs are ever the same.</p>
+      <span class="feature-tag">AI DUNGEON MASTER</span>
+    </div>
+    <div class="feature-card reveal">
+      <div class="feature-icon">🎲</div>
+      <h3>REAL DICE MECHANICS</h3>
+      <p>D4, D6, D8, D10, D12, D20 — every action triggers a roll. Critical hits, fumbles, and epic saves are all one throw away.</p>
+      <span class="feature-tag">D&D INSPIRED</span>
+    </div>
+    <div class="feature-card reveal">
+      <div class="feature-icon">🎒</div>
+      <h3>ITEMS & LOOT</h3>
+      <p>Discover swords, potions, grimoires, and cursed artifacts. Trade, craft, and hoard. Your inventory tells your story.</p>
+      <span class="feature-tag">100+ ITEMS</span>
+    </div>
+    <div class="feature-card reveal">
+      <div class="feature-icon">🏰</div>
+      <h3>DEEP DUNGEON WORLDS</h3>
+      <p>Explore procedurally generated caverns, haunted ruins, and dragon lairs — all described in rich, reactive prose.</p>
+      <span class="feature-tag">TERRARIA VIBES</span>
+    </div>
+    <div class="feature-card reveal">
+      <div class="feature-icon">🧙</div>
+      <h3>CHARACTER CLASSES</h3>
+      <p>Warrior, Rogue, Mage, Ranger, or Paladin. Your class changes the story, the available spells, and how the world reacts to you.</p>
+      <span class="feature-tag">5 CLASSES</span>
+    </div>
+    <div class="feature-card reveal">
+      <div class="feature-icon">🤝</div>
+      <h3>MULTIPLAYER PARTY</h3>
+      <p>Team up with up to 4 players. Share the dungeon, split the loot. One heals, one tanks, one backstabs — classic.</p>
+      <span class="feature-tag">CO-OP</span>
+    </div>
+  </div>
+</section>
+
+<div class="pixel-divider"></div>
+
+<!-- DEMO TERMINAL -->
+<section id="demo" style="background:#06060e;padding:80px 40px">
+  <p class="section-label reveal">✦ LIVE DEMO ✦</p>
+  <h2 class="section-title reveal">TRY THE DUNGEON</h2>
+  <p class="section-sub reveal">Type a command below and watch the adventure unfold.</p>
+  <div class="demo-wrap reveal">
+    <div class="demo-titlebar">
+      <div class="demo-dot red"></div>
+      <div class="demo-dot yellow"></div>
+      <div class="demo-dot green"></div>
+      <span class="demo-titlebar-txt">DUNGEONSCROLL v1.0 — session://cavern-of-echoes</span>
+    </div>
+    <div class="demo-body">
+      <div>
+        <div class="demo-terminal" id="terminal">
+          <div class="sys">[DUNGEONSCROLL AI ENGINE INITIALIZED]</div>
+          <div class="sys">[DUNGEON MASTER AGENT: ONLINE]</div>
+          <div class="sys">[COMBAT AGENT: STANDBY]</div>
+          <div class="sys">──────────────────────────────────</div>
+          <div class="narrate"> </div>
+          <div class="narrate">You descend into the <span style="color:var(--torch)">Cavern of Echoes</span>.</div>
+          <div class="narrate">The air smells of damp stone and old magic.</div>
+          <div class="narrate">Torchlight reveals three paths:</div>
+          <div class="narrate"> </div>
+          <div class="narrate">  [A] A rusted iron door with runes</div>
+          <div class="narrate">  [B] A dark tunnel — you hear growling</div>
+          <div class="narrate">  [C] A glowing chest on a stone altar</div>
+          <div class="narrate"> </div>
+          <div id="type-cursor"><span class="cursor"></span></div>
+        </div>
+        <div class="demo-input-row">
+          <span class="demo-prompt">&gt;&gt;</span>
+          <input class="demo-input" id="demo-input" type="text" placeholder="Type your action... (try: attack goblin, open chest, look around)" spellcheck="false" autocomplete="off">
+          <button class="demo-send" onclick="sendDemoAction()">ENTER ↵</button>
+        </div>
+      </div>
+      <div class="demo-stats">
+        <div class="stat-block">
+          <h4>⚔ THERON — WARRIOR LV.4</h4>
+          <div class="stat-bar-wrap">
+            <span class="stat-bar-label" style="font-size:7px">HP</span>
+            <div class="stat-bar-outer"><div class="stat-bar-inner" style="width:72%;background:var(--hp)"></div></div>
+            <span class="stat-val">72/100</span>
+          </div>
+          <div class="stat-bar-wrap">
+            <span class="stat-bar-label" style="font-size:7px">MP</span>
+            <div class="stat-bar-outer"><div class="stat-bar-inner" style="width:45%;background:var(--mp)"></div></div>
+            <span class="stat-val">45/100</span>
+          </div>
+          <div class="stat-bar-wrap">
+            <span class="stat-bar-label" style="font-size:7px">XP</span>
+            <div class="stat-bar-outer"><div class="stat-bar-inner" style="width:60%;background:var(--xp)"></div></div>
+            <span class="stat-val">60%</span>
+          </div>
+        </div>
+        <div class="stat-block">
+          <h4>🎒 INVENTORY</h4>
+          <div class="inventory-grid">
+            <div class="inv-slot filled" title="Iron Sword">⚔️<span class="inv-count">1</span></div>
+            <div class="inv-slot filled" title="Health Potion">🧪<span class="inv-count">3</span></div>
+            <div class="inv-slot filled" title="Torch">🕯️<span class="inv-count">5</span></div>
+            <div class="inv-slot filled" title="Gold Coins">🪙<span class="inv-count">47</span></div>
+            <div class="inv-slot filled" title="Old Map">🗺️<span class="inv-count">1</span></div>
+            <div class="inv-slot filled" title="Magic Scroll">📜<span class="inv-count">2</span></div>
+            <div class="inv-slot" style="opacity:.3">·</div>
+            <div class="inv-slot" style="opacity:.3">·</div>
+          </div>
+        </div>
+        <div class="stat-block">
+          <h4>🎲 DICE</h4>
+          <p style="font-family:var(--term);font-size:14px;color:#555;margin-bottom:8px">Click to roll!</p>
+          <div class="mini-dice">
+            <div class="die" onclick="rollDie(this,4)" title="D4">D4</div>
+            <div class="die" onclick="rollDie(this,6)" title="D6">D6</div>
+            <div class="die" onclick="rollDie(this,8)" title="D8">D8</div>
+            <div class="die" onclick="rollDie(this,10)" title="D10">D10</div>
+            <div class="die" onclick="rollDie(this,12)" title="D12">D12</div>
+            <div class="die" onclick="rollDie(this,20)" title="D20">D20</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- HOW IT WORKS -->
+<section style="background:#080810;padding:80px 40px">
+  <p class="section-label reveal">✦ HOW IT WORKS ✦</p>
+  <h2 class="section-title reveal">THREE STEPS TO GLORY</h2>
+  <p class="section-sub reveal">No installs. No accounts. Just open the browser and type.</p>
+  <div class="how-grid">
+    <div class="how-step reveal">
+      <div class="step-num">🧙</div>
+      <h3>CHOOSE YOUR<br>CHARACTER</h3>
+      <p>Pick a class, name your hero, and set your difficulty. The AI adapts to your playstyle.</p>
+    </div>
+    <div class="how-step reveal">
+      <div class="step-num">💬</div>
+      <h3>TYPE YOUR<br>ACTIONS</h3>
+      <p>Natural language commands. "Attack the troll with my sword" or "bribe the merchant" — it all works.</p>
+    </div>
+    <div class="how-step reveal">
+      <div class="step-num">🎲</div>
+      <h3>ROLL DICE &<br>LOOT DROPS</h3>
+      <p>Your action triggers a dice roll. High rolls = glory. Low rolls = interesting consequences.</p>
+    </div>
+    <div class="how-step reveal">
+      <div class="step-num">🏆</div>
+      <h3>LEVEL UP &<br>CONQUER</h3>
+      <p>Collect XP, find legendary loot, and battle increasingly terrifying bosses across endless dungeons.</p>
+    </div>
+  </div>
+</section>
+
+<div class="pixel-divider"></div>
+
+<!-- ITEMS -->
+<section id="items" style="background:#07070f;padding:80px 40px">
+  <p class="section-label reveal">✦ LOOT SYSTEM ✦</p>
+  <h2 class="section-title reveal">EVERY CHEST IS A SURPRISE</h2>
+  <p class="section-sub reveal">From rusty daggers to legendary dragon-forged blades.</p>
+  <div class="items-row">
+    <div class="item-card common reveal">
+      <span class="item-emoji">🗡️</span>
+      <div class="item-name">IRON DAGGER</div>
+      <div class="item-stat">+5 ATK · 1D6</div>
+      <div class="item-rarity">COMMON</div>
+    </div>
+    <div class="item-card uncommon reveal">
+      <span class="item-emoji">🏹</span>
+      <div class="item-name">ELVEN LONGBOW</div>
+      <div class="item-stat">+12 ATK · 1D10</div>
+      <div class="item-rarity">UNCOMMON</div>
+    </div>
+    <div class="item-card rare reveal">
+      <span class="item-emoji">🔮</span>
+      <div class="item-name">CRYSTAL GRIMOIRE</div>
+      <div class="item-stat">+20 SPELL · 2D8</div>
+      <div class="item-rarity">RARE</div>
+    </div>
+    <div class="item-card epic reveal">
+      <span class="item-emoji">🛡️</span>
+      <div class="item-name">VOID AEGIS</div>
+      <div class="item-stat">+35 DEF · REFLECT 10%</div>
+      <div class="item-rarity">EPIC</div>
+    </div>
+    <div class="item-card legendary reveal">
+      <span class="item-emoji">⚡</span>
+      <div class="item-name">THUNDERFANG</div>
+      <div class="item-stat">+60 ATK · 3D20 CRIT</div>
+      <div class="item-rarity">LEGENDARY</div>
+    </div>
+  </div>
+</section>
+
+<!-- DICE -->
+<section id="dice" class="dice-section">
+  <p class="section-label reveal">✦ DICE SYSTEM ✦</p>
+  <h2 class="section-title reveal">FATE IS IN YOUR HANDS</h2>
+  <p class="section-sub reveal">Every action. Every choice. Every roll matters.</p>
+  <div class="dice-big-wrap">
+    <div class="dice-big reveal" onclick="rollBigDie(this,4)">
+      <div class="d-label">D4</div>
+      <div class="d-result">?</div>
+      <div class="d-sides">1 – 4</div>
+    </div>
+    <div class="dice-big reveal" onclick="rollBigDie(this,6)">
+      <div class="d-label">D6</div>
+      <div class="d-result">?</div>
+      <div class="d-sides">1 – 6</div>
+    </div>
+    <div class="dice-big reveal" onclick="rollBigDie(this,8)">
+      <div class="d-label">D8</div>
+      <div class="d-result">?</div>
+      <div class="d-sides">1 – 8</div>
+    </div>
+    <div class="dice-big reveal" onclick="rollBigDie(this,10)">
+      <div class="d-label">D10</div>
+      <div class="d-result">?</div>
+      <div class="d-sides">1 – 10</div>
+    </div>
+    <div class="dice-big reveal" onclick="rollBigDie(this,12)">
+      <div class="d-label">D12</div>
+      <div class="d-result">?</div>
+      <div class="d-sides">1 – 12</div>
+    </div>
+    <div class="dice-big reveal" onclick="rollBigDie(this,20)">
+      <div class="d-label">D20</div>
+      <div class="d-result">?</div>
+      <div class="d-sides">FATE DIE</div>
+    </div>
+  </div>
+  <p class="dice-hint reveal">↑ Click any die to roll</p>
+</section>
+
+<div class="pixel-divider"></div>
+
+<!-- CTA -->
+<section class="cta-section">
+  <p class="section-label reveal">✦ YOUR QUEST AWAITS ✦</p>
+  <h2 class="cta-title reveal">READY TO ENTER<br>THE DUNGEON?</h2>
+  <p class="cta-sub reveal">Free to play. No download. Just you, your words, and the dark.</p>
+  <div class="cta-buttons reveal">
+    <button class="btn-primary" style="font-size:10px;padding:18px 36px" onclick="document.getElementById('demo').scrollIntoView({behavior:'smooth'})">⚔ PLAY FOR FREE</button>
+    <button class="btn-secondary" style="font-size:10px;padding:16px 30px">📜 READ THE DOCS</button>
+  </div>
+  <p class="cta-note reveal">No registration needed · Works in any browser · AI-powered</p>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-logo">Dungeon<span>Scroll</span></div>
+  <div class="footer-links">
+    <a href="#">About</a>
+    <a href="#">How To Play</a>
+    <a href="#">Classes</a>
+    <a href="#">Lore</a>
+    <a href="#">GitHub</a>
+    <a href="#">Contact</a>
+  </div>
+  <p class="footer-copy">© 2026 DungeonScroll Team · Built with ❤ and Agentic AI · MPA 2026 Project</p>
+</footer>
+
+<script>
+/* ── STARS ── */
+(function(){
+  const c=document.getElementById('stars');
+  const ctx=c.getContext('2d');
+  function resize(){c.width=innerWidth;c.height=innerHeight}
+  resize();window.addEventListener('resize',resize);
+  const stars=Array.from({length:200},()=>({
+    x:Math.random()*innerWidth,
+    y:Math.random()*innerHeight*.7,
+    r:Math.random()*1.5+.3,
+    o:Math.random()*.8+.2,
+    sp:Math.random()*.5+.5
+  }));
+  let t=0;
+  function draw(){
+    ctx.clearRect(0,0,c.width,c.height);
+    stars.forEach(s=>{
+      ctx.beginPath();
+      ctx.arc(s.x,s.y,s.r,0,Math.PI*2);
+      ctx.fillStyle=`rgba(255,255,255,${s.o*(0.5+0.5*Math.sin(t*s.sp))})`;
+      ctx.fill();
+    });
+    t+=0.02;requestAnimationFrame(draw);
+  }
+  draw();
+})();
+
+/* ── DICE ROLLS ── */
+function rollDie(el,sides){
+  el.classList.add('rolling');
+  setTimeout(()=>el.classList.remove('rolling'),400);
+  let r=Math.ceil(Math.random()*sides);
+  setTimeout(()=>{el.textContent='D'+sides;el.innerHTML='D'+sides+'<br><b style="color:var(--gold);font-size:16px">'+r+'</b>';},200);
+}
+
+function rollBigDie(el,sides){
+  const resEl=el.querySelector('.d-result');
+  el.classList.remove('crit','fail');
+  el.style.animation='';
+  void el.offsetWidth;
+  resEl.textContent='...';
+  let frames=0;const maxF=12;
+  const iv=setInterval(()=>{
+    resEl.textContent=Math.ceil(Math.random()*sides);
+    frames++;
+    if(frames>=maxF){
+      clearInterval(iv);
+      const roll=Math.ceil(Math.random()*sides);
+      resEl.textContent=roll;
+      if(roll===sides){el.classList.add('crit');addTermLine('result','🎲 CRITICAL ROLL: '+roll+'! The gods smile upon you!')}
+      else if(roll===1){el.classList.add('fail');addTermLine('damage','🎲 FUMBLE: 1... Something has gone terribly wrong.')}
+      else{addTermLine('dice-roll','🎲 Rolled D'+sides+': '+roll)}
+    }
+  },60);
+}
+
+/* ── TERMINAL DEMO ── */
+const responses=[
+  {
+    cmd:['open chest','open the chest','c','loot chest','take chest'],
+    lines:[
+      {cls:'narrate',t:'You approach the glowing stone altar cautiously.'},
+      {cls:'dice-roll',t:'🎲 Rolling Perception Check... D20'},
+      {cls:'result',t:'Result: 17 — Success!'},
+      {cls:'narrate',t:'The runes pulse green. The chest clicks open.'},
+      {cls:'item',t:'✦ You found: [ELVEN LONGBOW] — Uncommon'},
+      {cls:'item',t:'✦ You found: 🪙 23 Gold Coins'},
+      {cls:'result',t:'+150 XP earned!'},
+    ]
+  },
+  {
+    cmd:['attack goblin','fight goblin','kill goblin','attack'],
+    lines:[
+      {cls:'narrate',t:'A CAVE GOBLIN leaps from the shadows!'},
+      {cls:'narrate',t:'GOBLIN — HP: 24/24 · ATK: 8 · DEF: 4'},
+      {cls:'dice-roll',t:'🎲 Rolling Attack... D20'},
+      {cls:'result',t:'Result: 14 — Hit!'},
+      {cls:'damage',t:'⚔ You deal 12 damage to the Goblin!'},
+      {cls:'dice-roll',t:'🎲 Goblin counterattacks... D6'},
+      {cls:'damage',t:'💀 Goblin deals 5 damage to you. HP: 67/100'},
+      {cls:'result',t:'Combat continues...'},
+    ]
+  },
+  {
+    cmd:['look around','look','inspect','examine','a','door','rune door'],
+    lines:[
+      {cls:'narrate',t:'You trace the runes with your fingers.'},
+      {cls:'dice-roll',t:'🎲 Rolling Arcana Check... D12'},
+      {cls:'result',t:'Result: 9 — Partial knowledge'},
+      {cls:'narrate',t:'The runes read: "ONLY THE WORTHY SHALL PASS"'},
+      {cls:'narrate',t:'A slot in the door — shaped like a gem...'},
+      {cls:'item',t:'Hint: You need a [SAPPHIRE GEM] to proceed.'},
+    ]
+  },
+  {
+    cmd:['go north','b','tunnel','dark tunnel','go deeper','explore'],
+    lines:[
+      {cls:'narrate',t:'You steel yourself and enter the dark tunnel.'},
+      {cls:'dice-roll',t:'🎲 Rolling Stealth... D8'},
+      {cls:'result',t:'Result: 3 — The growling gets louder.'},
+      {cls:'damage',t:'A STONE TROLL blocks your path!'},
+      {cls:'narrate',t:'STONE TROLL — HP: 80/80 · ATK: 18 · DEF: 12'},
+      {cls:'narrate',t:'What do you do?'},
+      {cls:'narrate',t:'  [attack] [run] [use scroll] [negotiate]'},
+    ]
+  },
+  {
+    cmd:['use potion','drink potion','heal','heal myself'],
+    lines:[
+      {cls:'narrate',t:'You uncork a shimmering Health Potion.'},
+      {cls:'dice-roll',t:'🎲 Rolling Healing... D8 + CON modifier'},
+      {cls:'result',t:'Result: 6 + 3 = 9 HP restored'},
+      {cls:'result',t:'HP: 81/100 ♥ You feel better.'},
+      {cls:'item',t:'[Health Potion] x2 remaining in inventory.'},
+    ]
+  },
+];
+
+function addTermLine(cls,text,delay=0){
+  setTimeout(()=>{
+    const t=document.getElementById('terminal');
+    const cur=document.getElementById('type-cursor');
+    const div=document.createElement('div');
+    div.className=cls;div.textContent=text;
+    t.insertBefore(div,cur);
+    t.scrollTop=t.scrollHeight;
+  },delay);
+}
+
+function sendDemoAction(){
+  const inp=document.getElementById('demo-input');
+  const raw=inp.value.trim();
+  if(!raw)return;
+  inp.value='';
+  const cmd=raw.toLowerCase();
+  addTermLine('input-line','>> '+raw);
+  let found=null;
+  for(const r of responses){if(r.cmd.some(c=>cmd.includes(c))){found=r;break}}
+  if(!found){
+    addTermLine('narrate','The dungeon echoes with your words...',200);
+    addTermLine('dice-roll','🎲 Rolling Improvisation Check... D20',500);
+    const roll=Math.ceil(Math.random()*20);
+    if(roll>=15){
+      addTermLine('result','Result: '+roll+' — The AI Dungeon Master is impressed!',900);
+      addTermLine('narrate','An unexpected path opens before you...',1300);
+    } else if(roll>=8){
+      addTermLine('result','Result: '+roll+' — The dungeon responds slowly.',900);
+      addTermLine('narrate','Nothing obvious happens, but you sense something changed.',1300);
+    } else {
+      addTermLine('damage','Result: '+roll+' — Misfortune!',900);
+      addTermLine('damage','A loose stone falls. HP: -4. Be more careful.',1300);
+    }
+    return;
+  }
+  found.lines.forEach((l,i)=>addTermLine(l.cls,l.t,(i+1)*400));
+}
+
+document.getElementById('demo-input').addEventListener('keydown',e=>{if(e.key==='Enter')sendDemoAction()});
+
+/* ── SCROLL REVEAL ── */
+const reveals=document.querySelectorAll('.reveal');
+const obs=new IntersectionObserver(entries=>{
+  entries.forEach(e=>{if(e.isIntersecting){e.target.classList.add('visible');obs.unobserve(e.target)}});
+},{threshold:.1});
+reveals.forEach(r=>obs.observe(r));
+</script>
+</body>
+</html>
