@@ -70,13 +70,18 @@ function Avatar({ url, name }: { url: string; name: string }) {
     setStatus("loading");
   }, [url]);
 
+  // Route pollinations URLs through our same-origin proxy; pass other URLs through.
+  const src = url.startsWith("https://image.pollinations.ai/")
+    ? `/api/image-proxy?url=${encodeURIComponent(url)}`
+    : url;
+
   return (
     <div className="relative h-14 w-14 flex-shrink-0 overflow-hidden border-2 border-torch bg-bg">
       {status !== "error" ? (
         // eslint-disable-next-line @next/next/no-img-element
         <img
-          src={url}
-          alt={`Portret ${name}`}
+          src={src}
+          alt={`Portrait ${name}`}
           width={56}
           height={56}
           onLoad={() => setStatus("ready")}
@@ -84,6 +89,7 @@ function Avatar({ url, name }: { url: string; name: string }) {
           className={`h-14 w-14 object-cover transition-opacity duration-500 ${
             status === "ready" ? "opacity-100" : "opacity-0"
           }`}
+          style={{ imageRendering: "pixelated" }}
         />
       ) : null}
       {status === "loading" ? (

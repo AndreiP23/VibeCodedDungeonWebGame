@@ -18,15 +18,17 @@ export function AvatarPreview({ image, rolling, onReroll }: AvatarPreviewProps) 
   const buttonLabel = image ? "🎲 Re-roll Avatar" : "🎲 Generate Avatar";
 
   const [imgLoaded, setImgLoaded] = useState(false);
+  const [imgError, setImgError] = useState(false);
 
   // Reset load state whenever a new image URL arrives.
   useEffect(() => {
     setImgLoaded(false);
+    setImgError(false);
   }, [image?.url]);
 
   const showImg = !!image && !rolling;
-  // Overlay stays up while: agent is rolling, OR image is mounted but not yet loaded.
-  const showSpinner = rolling || (showImg && !imgLoaded);
+  // Overlay stays up while: agent is rolling, OR image is mounted but not yet loaded (and no error).
+  const showSpinner = rolling || (showImg && !imgLoaded && !imgError);
   const showEmpty = !image && !rolling;
 
   return (
@@ -40,6 +42,7 @@ export function AvatarPreview({ image, rolling, onReroll }: AvatarPreviewProps) 
             width={256}
             height={256}
             onLoad={() => setImgLoaded(true)}
+            onError={() => setImgError(true)}
             className={`h-64 w-64 object-cover transition-opacity duration-300 ${
               imgLoaded ? "opacity-100" : "opacity-0"
             }`}
@@ -52,6 +55,14 @@ export function AvatarPreview({ image, rolling, onReroll }: AvatarPreviewProps) 
             <div className="text-4xl animate-pulse" aria-hidden>🔥</div>
             <p className="font-display text-[10px] tracking-wider text-torch animate-pulse">
               {rolling ? "FORGING PORTRAIT..." : "RENDERING..."}
+            </p>
+          </div>
+        ) : null}
+
+        {imgError ? (
+          <div className="absolute inset-0 flex items-center justify-center bg-bg/90">
+            <p className="font-display text-[9px] tracking-wider text-hp text-center px-4">
+              IMAGE SERVICE BUSY.<br />WAIT A FEW SECONDS<br />AND RE-ROLL.
             </p>
           </div>
         ) : null}
