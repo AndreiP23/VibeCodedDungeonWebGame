@@ -1,8 +1,6 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
 import { GameState } from "@/lib/game/types";
 
@@ -14,7 +12,7 @@ function Avatar({ url, name }: { url: string; name: string }) {
   }, [url]);
 
   return (
-    <div className="relative h-14 w-14 flex-shrink-0 overflow-hidden rounded-md border border-zinc-700 bg-zinc-900">
+    <div className="relative h-14 w-14 flex-shrink-0 overflow-hidden border-2 border-torch bg-bg">
       {status !== "error" ? (
         // eslint-disable-next-line @next/next/no-img-element
         <img
@@ -30,7 +28,7 @@ function Avatar({ url, name }: { url: string; name: string }) {
         />
       ) : null}
       {status === "loading" ? (
-        <div className="absolute inset-0 flex items-center justify-center text-xs text-zinc-500">
+        <div className="absolute inset-0 flex items-center justify-center text-xs text-text-dim">
           <span className="animate-pulse">…</span>
         </div>
       ) : null}
@@ -47,112 +45,108 @@ interface StatsSidebarProps {
   state: GameState;
 }
 
+function SidebarPanel({ title, children }: { title: string; children: React.ReactNode }) {
+  return (
+    <section className="border-4 border-torch bg-bg p-3 shadow-[4px_4px_0_rgba(0,0,0,0.8)]">
+      <h2 className="font-display text-[10px] uppercase tracking-wider text-torch mb-3">{title}</h2>
+      {children}
+    </section>
+  );
+}
+
 export function StatsSidebar({ state }: StatsSidebarProps) {
   const hpPercent =
     state.player.hp.max > 0
-      ? Math.round((state.player.hp.current / state.player.hp.max) * 100)
+      ? Math.max(0, Math.min(100, Math.round((state.player.hp.current / state.player.hp.max) * 100)))
       : 0;
   const activeQuest = state.world.activeQuests.find((quest) => quest.status === "active");
+  const completedQuests = state.world.activeQuests.filter((quest) => quest.status === "completed");
 
   return (
-    <div className="space-y-4">
-      <Card>
-        <CardHeader className="pb-3">
-          <div className="flex items-center gap-3">
-            {state.player.avatarUrl ? (
-              <Avatar url={state.player.avatarUrl} name={state.player.name} />
-            ) : null}
-            <div className="min-w-0 flex-1">
-              <CardTitle className="text-lg">{state.player.name}</CardTitle>
-              <p className="text-sm capitalize text-muted-foreground">{state.player.class}</p>
-            </div>
-          </div>
-        </CardHeader>
-        <CardContent className="space-y-3">
-          <div className="space-y-1">
-            <p className="text-sm font-medium">HP</p>
-            <Progress value={hpPercent} />
-            <p className="text-xs text-muted-foreground">
-              {state.player.hp.current}/{state.player.hp.max}
-            </p>
-          </div>
-          <div className="grid grid-cols-2 gap-2 text-sm">
-            <p>STR: {state.player.stats.str}</p>
-            <p>DEX: {state.player.stats.dex}</p>
-            <p>INT: {state.player.stats.int}</p>
-            <p>CHA: {state.player.stats.cha}</p>
-          </div>
-          <p className="text-sm font-medium">Aur: {state.player.gold}</p>
-          <p className="text-sm">Locatie: {state.player.location}</p>
-          {state.player.flavorTrait ? (
-            <p className="text-xs italic text-muted-foreground">
-              {state.player.flavorTrait}
-            </p>
+    <div className="space-y-3">
+      <SidebarPanel title={state.player.name}>
+        <div className="flex items-center gap-3 mb-3">
+          {state.player.avatarUrl ? (
+            <Avatar url={state.player.avatarUrl} name={state.player.name} />
           ) : null}
-        </CardContent>
-      </Card>
+          <p className="text-text-dim text-lg capitalize">{state.player.class}</p>
+        </div>
+
+        <div className="mb-3">
+          <p className="font-display text-[9px] uppercase tracking-wider text-hp mb-1">HP</p>
+          <div className="relative h-4 w-full border-2 border-hp bg-bg overflow-hidden">
+            <div
+              className="absolute inset-y-0 left-0 bg-hp transition-all duration-300"
+              style={{ width: `${hpPercent}%`, boxShadow: "inset 0 -2px 0 rgba(0,0,0,0.3)" }}
+            />
+          </div>
+          <p className="text-text-dim text-sm mt-1">
+            {state.player.hp.current}/{state.player.hp.max}
+          </p>
+        </div>
+
+        <div className="grid grid-cols-2 gap-1 text-base text-text">
+          <p>STR: {state.player.stats.str}</p>
+          <p>DEX: {state.player.stats.dex}</p>
+          <p>INT: {state.player.stats.int}</p>
+          <p>CHA: {state.player.stats.cha}</p>
+        </div>
+
+        <p className="mt-3 text-base text-gold">⛁ Aur: {state.player.gold}</p>
+        <p className="text-base text-text-dim">📍 {state.player.location}</p>
+
+        {state.player.flavorTrait ? (
+          <p className="mt-2 text-sm italic text-text-dim">{state.player.flavorTrait}</p>
+        ) : null}
+      </SidebarPanel>
 
       {state.player.backstory ? (
-        <Card>
-          <CardHeader className="pb-3">
-            <CardTitle className="text-lg">Poveste</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="whitespace-pre-line text-xs leading-relaxed text-muted-foreground">
-              {state.player.backstory}
-            </p>
-          </CardContent>
-        </Card>
+        <SidebarPanel title="Poveste">
+          <p className="whitespace-pre-line text-sm leading-relaxed text-text-dim">
+            {state.player.backstory}
+          </p>
+        </SidebarPanel>
       ) : null}
 
-      <Card>
-        <CardHeader className="pb-3">
-          <CardTitle className="text-lg">Inventar</CardTitle>
-        </CardHeader>
-        <CardContent className="flex flex-wrap gap-2">
-          {state.player.inventory.map((item) => (
-            <Badge variant="secondary" key={item}>
-              {item}
-            </Badge>
-          ))}
-        </CardContent>
-      </Card>
+      <SidebarPanel title="Inventar">
+        {state.player.inventory.length === 0 ? (
+          <p className="text-text-dim text-sm">Gol</p>
+        ) : (
+          <div className="grid grid-cols-2 gap-2">
+            {state.player.inventory.map((item) => (
+              <Badge variant="secondary" key={item} className="justify-center">
+                {item}
+              </Badge>
+            ))}
+          </div>
+        )}
+      </SidebarPanel>
 
-      <Card>
-        <CardHeader className="pb-3">
-          <CardTitle className="text-lg">Quest Activ</CardTitle>
-        </CardHeader>
-        <CardContent>
-          {activeQuest ? (
-            <div className="space-y-2">
-              <p className="font-medium">{activeQuest.title}</p>
-              <p className="text-sm text-muted-foreground">{activeQuest.description}</p>
-            </div>
-          ) : (
-            <p className="text-sm text-muted-foreground">Nu ai quest-uri active.</p>
-          )}
-        </CardContent>
-      </Card>
+      <SidebarPanel title="Quest Activ">
+        {activeQuest ? (
+          <div className="space-y-1">
+            <p className="text-torch text-base">{activeQuest.title}</p>
+            <p className="text-text-dim text-sm">{activeQuest.description}</p>
+          </div>
+        ) : (
+          <p className="text-text-dim text-sm">Nu ai quest-uri active.</p>
+        )}
+      </SidebarPanel>
 
-      <Card>
-        <CardHeader className="pb-3">
-          <CardTitle className="text-lg">Quest-uri terminate</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-2">
-          {state.world.activeQuests.filter((quest) => quest.status === "completed").length === 0 ? (
-            <p className="text-sm text-muted-foreground">Nimic încă.</p>
-          ) : (
-            state.world.activeQuests
-              .filter((quest) => quest.status === "completed")
-              .map((quest) => (
-                <div key={quest.id} className="flex items-center gap-2">
-                  <Badge variant="success">✓</Badge>
-                  <p className="text-sm">{quest.title}</p>
-                </div>
-              ))
-          )}
-        </CardContent>
-      </Card>
+      <SidebarPanel title="Terminate">
+        {completedQuests.length === 0 ? (
+          <p className="text-text-dim text-sm">Nimic încă.</p>
+        ) : (
+          <div className="space-y-2">
+            {completedQuests.map((quest) => (
+              <div key={quest.id} className="flex items-center gap-2">
+                <Badge variant="success">✓</Badge>
+                <p className="text-base text-gold">{quest.title}</p>
+              </div>
+            ))}
+          </div>
+        )}
+      </SidebarPanel>
     </div>
   );
 }
