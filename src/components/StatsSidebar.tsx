@@ -174,6 +174,16 @@ export function StatsSidebar({ state }: StatsSidebarProps) {
           </div>
         )}
       </SidebarPanel>
+
+      <section className="border-4 border-dashed border-gem-purple/60 bg-bg p-3 opacity-80 hover:opacity-100 transition-opacity">
+        <h2 className="font-display text-[10px] uppercase tracking-wider text-gem-purple mb-2 animate-pulse">
+          🤝 Multiplayer
+        </h2>
+        <p className="text-base text-text-dim leading-snug">
+          Co-op parties of up to 4 heroes —{" "}
+          <span className="text-gem-purple font-medium">coming soon</span>.
+        </p>
+      </section>
     </div>
   );
 }
