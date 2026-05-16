@@ -226,9 +226,24 @@ export async function getOrCreateGameState(options: {
   };
 }
 
+// Extended shape: in addition to the regular Partial<GameState> fields, the
+// DM agent can include delta operations inside `changes.player`. These are
+// applied to currentState before the normal merge, so the DM does NOT need
+// to send the full inventory/gold/hp to mutate a piece of it.
+type PlayerDeltaChanges = Partial<GameState["player"]> & {
+  goldDelta?: number;
+  hpDelta?: number;
+  addItems?: unknown[];
+  removeItems?: string[];
+};
+
+export type UpdateGameStateChanges = Omit<Partial<GameState>, "player"> & {
+  player?: PlayerDeltaChanges;
+};
+
 export async function updateGameState(
   sessionId: string,
-  changes: Partial<GameState>,
+  changes: UpdateGameStateChanges,
 ): Promise<GameState> {
   const sessions = await readSessions();
   const currentState = sessions[sessionId];
@@ -237,23 +252,79 @@ export async function updateGameState(
     throw new Error("Session not found for updateGameState.");
   }
 
+  // Apply delta operations against currentState, then strip the delta keys
+  // before the regular merge so they don't leak into nextState.player.
+  const rawPlayer = changes.player ?? {};
+  const {
+    goldDelta,
+    hpDelta,
+    addItems,
+    removeItems,
+    ...playerRest
+  } = rawPlayer;
+
+  const currentInventory = normalizeInventory(currentState.player.inventory);
+
+  let workingInventory = currentInventory;
+  if (Array.isArray(removeItems) && removeItems.length > 0) {
+    const removeSet = new Set(
+      removeItems
+        .filter((name): name is string => typeof name === "string")
+        .map((name) => name.trim().toLowerCase())
+        .filter((name) => name.length > 0),
+    );
+    if (removeSet.size > 0) {
+      const next: InventoryItem[] = [];
+      for (const item of workingInventory) {
+        if (removeSet.has(item.name.toLowerCase())) {
+          removeSet.delete(item.name.toLowerCase()); // remove only the first match per name
+          continue;
+        }
+        next.push(item);
+      }
+      workingInventory = next;
+    }
+  }
+  if (Array.isArray(addItems) && addItems.length > 0) {
+    const additions = addItems
+      .map((entry) => normalizeInventoryItem(entry))
+      .filter((entry): entry is InventoryItem => entry !== null);
+    workingInventory = [...workingInventory, ...additions];
+  }
+  // Full-replace inventory still wins if explicitly provided.
+  if (playerRest.inventory !== undefined) {
+    workingInventory = normalizeInventory(playerRest.inventory);
+  }
+
+  // Gold: explicit value wins; otherwise apply delta.
+  let nextGold = currentState.player.gold;
+  if (typeof playerRest.gold === "number") {
+    nextGold = playerRest.gold;
+  } else if (typeof goldDelta === "number") {
+    nextGold = Math.max(0, currentState.player.gold + goldDelta);
+  }
+
+  // HP: hpDelta applies to current; full replace via hp.current/hp.max wins if present.
+  let nextHpCurrent = currentState.player.hp.current;
+  let nextHpMax = currentState.player.hp.max;
+  if (playerRest.hp?.current !== undefined) nextHpCurrent = playerRest.hp.current;
+  else if (typeof hpDelta === "number") nextHpCurrent = currentState.player.hp.current + hpDelta;
+  if (playerRest.hp?.max !== undefined) nextHpMax = playerRest.hp.max;
+  nextHpCurrent = Math.max(0, Math.min(nextHpMax, nextHpCurrent));
+
   const nextState: GameState = {
     ...currentState,
     ...changes,
     player: {
       ...currentState.player,
-      ...(changes.player ?? {}),
-      hp: {
-        ...currentState.player.hp,
-        ...(changes.player?.hp ?? {}),
-      },
+      ...playerRest,
+      hp: { current: nextHpCurrent, max: nextHpMax },
       stats: {
         ...currentState.player.stats,
-        ...(changes.player?.stats ?? {}),
+        ...(playerRest.stats ?? {}),
       },
-      inventory: changes.player?.inventory
-        ? normalizeInventory(changes.player.inventory)
-        : normalizeInventory(currentState.player.inventory),
+      inventory: workingInventory,
+      gold: nextGold,
     },
     world: {
       ...currentState.world,

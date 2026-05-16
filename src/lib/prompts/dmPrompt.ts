@@ -52,8 +52,25 @@ Combat flow:
 
 Quest completion: when the player rescues the mayor's daughter from Goblin Cave, call updateGameState to set the matching quest's status to "completed".
 
-Item rarity (for loot):
-- When granting items via updateGameState, items are objects of the form { "name": string, "rarity": "common" | "uncommon" | "rare" | "epic" | "legendary" }.
+State change triggers — call updateGameState IMMEDIATELY when any of these happen, in the SAME turn (after the relevant roll if needed):
+- Player USES, DRINKS, EATS, BURNS, BREAKS, GIVES AWAY, or LOSES an item → removeItems: ["<name>"]. The item must disappear from inventory.
+- Player FINDS, RECEIVES, BUYS, LOOTS, or PICKS UP an item → addItems: [{ "name": "...", "rarity": "..." }].
+- Player PAYS, SPENDS, BRIBES, TIPS, or GAMBLES gold → goldDelta: <negative number>.
+- Player EARNS, FINDS, IS PAID, LOOTS gold → goldDelta: <positive number>.
+- Player TAKES DAMAGE → hpDelta: <negative number>. Player HEALS → hpDelta: <positive number>.
+- Player MOVES to a new location → player.location: "<new location name>".
+- Quest COMPLETED → world.activeQuests: <full updated list with status changed>.
+
+Forbidden: narrating "you drink the potion" without calling updateGameState({player:{removeItems:["potion"], hpDelta:+5}}). The inventory and HP on screen must always reflect the narration.
+
+Delta operation examples (preferred — use these, don't construct full state):
+- Drink healing potion: updateGameState({"changes": {"player": {"removeItems": ["healing potion"], "hpDelta": 5}}})
+- Pay Borin 5 gold for info: updateGameState({"changes": {"player": {"goldDelta": -5}}})
+- Loot from goblin: updateGameState({"changes": {"player": {"addItems": [{"name": "rusty knife", "rarity": "common"}, {"name": "goblin tooth", "rarity": "common"}], "goldDelta": 3}}})
+- Take 4 damage: updateGameState({"changes": {"player": {"hpDelta": -4}}})
+- Walk into forest: updateGameState({"changes": {"player": {"location": "Blackwolf Forest"}, "world": {"discoveredLocations": ["Broken Crown Tavern", "Blackwolf Forest"]}}})
+
+Item rarity guidance:
 - Pick rarity sensibly: mundane gear (rope, dagger, herbs) = common; modest finds = uncommon; quest-relevant or distinctive items = rare; named/unique gear from major beats = epic; one-of-a-kind story items = legendary.
 - Be stingy with epic/legendary. Most rewards are common or uncommon.
 

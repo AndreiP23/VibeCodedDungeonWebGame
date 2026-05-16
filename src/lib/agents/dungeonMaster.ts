@@ -135,12 +135,41 @@ export async function runDungeonMasterTurn(
     {
       name: "updateGameState",
       description:
-        "Persist canonical game state updates. Use this for HP, inventory, gold, stats, location and quest changes.",
+        "Persist canonical game state updates. Use this for HP, inventory, gold, stats, location and quest changes. Prefer DELTA operations inside changes.player: { goldDelta: number, hpDelta: number, addItems: [{name, rarity}], removeItems: [name] }. Full-replace fields (player.gold, player.hp.current, player.inventory) also work but only use them when you genuinely want to overwrite. ALWAYS call this immediately after any narrated action that changes state (item used/consumed, gold paid/earned, item picked up, damage taken/dealt, location change, quest completed).",
       input_schema: {
         type: "object",
         properties: {
           changes: {
             type: "object",
+            properties: {
+              player: {
+                type: "object",
+                properties: {
+                  goldDelta: { type: "number", description: "Adjust gold by this amount (negative to spend)." },
+                  hpDelta: { type: "number", description: "Adjust current HP by this amount (negative for damage)." },
+                  addItems: {
+                    type: "array",
+                    description: "Items to append to inventory.",
+                    items: {
+                      type: "object",
+                      properties: {
+                        name: { type: "string" },
+                        rarity: { enum: ["common", "uncommon", "rare", "epic", "legendary"] },
+                      },
+                      required: ["name", "rarity"],
+                    },
+                  },
+                  removeItems: {
+                    type: "array",
+                    description: "Names of items to remove from inventory (one match per name).",
+                    items: { type: "string" },
+                  },
+                  location: { type: "string", description: "Change current location." },
+                },
+                additionalProperties: true,
+              },
+              world: { type: "object", additionalProperties: true },
+            },
             additionalProperties: true,
           },
         },
