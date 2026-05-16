@@ -276,6 +276,26 @@ section{position:relative;z-index:1;padding:80px 40px}
   border:1px solid rgba(255,157,0,0.25);
   color:var(--torch);letter-spacing:1px;
 }
+.feature-card.coming-soon{
+  opacity:0.72;
+  border-style:dashed;
+  border-color:rgba(187,68,255,0.45);
+}
+.feature-card.coming-soon:hover{
+  opacity:1;
+  border-color:var(--gem-purple);
+  box-shadow:0 8px 32px rgba(187,68,255,0.18);
+}
+.feature-tag.soon{
+  background:rgba(187,68,255,0.12);
+  border-color:rgba(187,68,255,0.4);
+  color:var(--gem-purple);
+  animation:soon-pulse 2.4s ease-in-out infinite;
+}
+@keyframes soon-pulse{
+  0%,100%{opacity:0.75}
+  50%{opacity:1}
+}
 
 /* ── TERMINAL DEMO ── */
 .demo-wrap{
@@ -630,11 +650,11 @@ footer{
       <p>Warrior, Rogue, Mage, Ranger, or Paladin. Your class changes the story, the available spells, and how the world reacts to you.</p>
       <span class="feature-tag">5 CLASSES</span>
     </div>
-    <div class="feature-card reveal">
+    <div class="feature-card coming-soon reveal">
       <div class="feature-icon">🤝</div>
       <h3>MULTIPLAYER PARTY</h3>
-      <p>Team up with up to 4 players. Share the dungeon, split the loot. One heals, one tanks, one backstabs — classic.</p>
-      <span class="feature-tag">CO-OP</span>
+      <p>Team up with up to 4 players. Share the dungeon, split the loot. One heals, one tanks, one backstabs — classic. <strong style="color:var(--gem-purple)">Coming soon.</strong></p>
+      <span class="feature-tag soon">COMING SOON</span>
     </div>
   </div>
 </section>
