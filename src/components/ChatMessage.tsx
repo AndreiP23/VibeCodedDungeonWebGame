@@ -1,46 +1,52 @@
-import { Badge } from "@/components/ui/badge";
-import { Card, CardContent } from "@/components/ui/card";
-
 interface ChatMessageProps {
-  role: "player" | "dm" | "npc";
+  role: "player" | "dm" | "npc" | "system";
   content: string;
+  npcName?: string;
 }
 
 const roleLabel: Record<ChatMessageProps["role"], string> = {
-  player: "Jucator",
+  player: "Tu",
   dm: "Dungeon Master",
   npc: "NPC",
+  system: "Sistem",
 };
 
-export function ChatMessage({ role, content }: ChatMessageProps) {
+const roleClasses: Record<ChatMessageProps["role"], { wrap: string; label: string; text: string }> = {
+  player: {
+    wrap: "border-torch bg-bg",
+    label: "text-torch",
+    text: "text-text",
+  },
+  dm: {
+    wrap: "border-text-dim bg-bg",
+    label: "text-text-dim",
+    text: "text-text italic",
+  },
+  npc: {
+    wrap: "border-gem-purple bg-bg",
+    label: "text-gem-purple",
+    text: "text-text",
+  },
+  system: {
+    wrap: "border-gem-green bg-bg",
+    label: "text-gem-green",
+    text: "text-text",
+  },
+};
+
+export function ChatMessage({ role, content, npcName }: ChatMessageProps) {
   const isPlayer = role === "player";
+  const styles = roleClasses[role];
+  const label = role === "npc" && npcName ? npcName.toUpperCase() : roleLabel[role].toUpperCase();
 
   return (
     <div className={`flex ${isPlayer ? "justify-end" : "justify-start"}`}>
-      <Card
-        className={`max-w-[90%] border ${
-          role === "dm"
-            ? "border-amber-300 bg-amber-50"
-            : role === "npc"
-              ? "border-sky-300 bg-sky-50"
-              : "border-zinc-300 bg-zinc-900 text-zinc-100"
-        }`}
+      <div
+        className={`max-w-[90%] border-4 ${styles.wrap} p-3 shadow-[4px_4px_0_rgba(0,0,0,0.8)]`}
       >
-        <CardContent className="space-y-2 p-3">
-          <Badge variant={isPlayer ? "secondary" : "default"}>{roleLabel[role]}</Badge>
-          <p
-            className={
-              role === "dm"
-                ? "italic text-amber-900"
-                : role === "npc"
-                  ? "text-sky-900"
-                  : ""
-            }
-          >
-            {content}
-          </p>
-        </CardContent>
-      </Card>
+        <p className={`font-display text-[10px] tracking-wider mb-2 ${styles.label}`}>{label}</p>
+        <p className={`text-lg leading-snug ${styles.text}`}>{content}</p>
+      </div>
     </div>
   );
 }

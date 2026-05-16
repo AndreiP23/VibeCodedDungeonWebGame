@@ -27,6 +27,8 @@ const config: Config = {
         destructive: "var(--destructive)",
         "destructive-foreground": "var(--destructive-foreground)",
         ring: "var(--ring)",
+        bg: "var(--bg)",
+        text: "var(--text)",
         torch: "var(--torch)",
         torch2: "var(--torch2)",
         gold: "var(--gold)",
