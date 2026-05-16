@@ -40,6 +40,7 @@ const requestSchema = z.object({
   bonuses: bonusesSchema,
   toolUseId: z.string().optional(),
   roll: z.number().int().min(1).max(20).optional(),
+  avatarUrl: z.string().max(2048).optional(),
 });
 
 const VALID_SIDES: readonly DiceSides[] = [4, 6, 8, 10, 12, 20];
@@ -128,6 +129,7 @@ export async function POST(request: NextRequest) {
             flavorTrait: payload.bonuses.flavorTrait,
           }
         : undefined,
+      avatarUrl: payload.avatarUrl,
     });
 
     const sessionId = game.sessionId;

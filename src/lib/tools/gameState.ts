@@ -112,6 +112,7 @@ interface BuildInitialStateOptions {
   playerClass: PlayerClass;
   backstory?: string;
   bonuses?: PlayerBonuses;
+  avatarUrl?: string;
 }
 
 function buildInitialState(options: BuildInitialStateOptions): GameState {
@@ -131,7 +132,9 @@ function buildInitialState(options: BuildInitialStateOptions): GameState {
   const inventory: InventoryItem[] = [...preset.inventory, ...bonusItems];
   const gold = preset.gold + (safeBonuses?.goldBonus ?? 0);
   const finalBackstory = backstory?.trim() || buildRandomBackstory(playerClass);
-  const avatar = buildAvatarSpec(playerClass, finalBackstory);
+  const avatar = options.avatarUrl
+    ? { url: options.avatarUrl }
+    : buildAvatarSpec(playerClass, finalBackstory);
 
   return {
     player: {
@@ -203,6 +206,7 @@ export async function getOrCreateGameState(options: {
   playerClass: PlayerClass;
   backstory?: string;
   bonuses?: PlayerBonuses;
+  avatarUrl?: string;
 }): Promise<{ sessionId: string; state: GameState; created: boolean }> {
   const sessionId = options.sessionId ?? randomUUID();
   const sessions = await readSessions();
@@ -214,6 +218,7 @@ export async function getOrCreateGameState(options: {
       playerClass: options.playerClass,
       backstory: options.backstory,
       bonuses: options.bonuses,
+      avatarUrl: options.avatarUrl,
     });
     await writeSessions(sessions);
     created = true;
