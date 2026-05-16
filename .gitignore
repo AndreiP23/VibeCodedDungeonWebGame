@@ -24,6 +24,9 @@
 .DS_Store
 *.pem
 
+# runtime image cache (populated by /api/image; safe to regenerate)
+/data/image-cache.json
+
 # debug
 npm-debug.log*
 yarn-debug.log*
