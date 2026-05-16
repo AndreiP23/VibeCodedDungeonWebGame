@@ -84,7 +84,7 @@ export default function CharacterPage() {
         </CardHeader>
         <CardContent className="space-y-6">
           <div className="space-y-2">
-            <label className="text-sm font-medium">Nume</label>
+            <label className="text-base font-medium">Nume</label>
             <Input
               value={name}
               onChange={(event) => {
@@ -92,7 +92,7 @@ export default function CharacterPage() {
                 clearReview();
               }}
               placeholder="Numele eroului"
-              className="border-4 border-text-dim bg-bg text-text focus:border-torch focus:outline-none"
+              className="border-4 border-text-dim bg-bg text-text text-lg focus:border-torch focus:outline-none"
             />
           </div>
 
@@ -111,14 +111,14 @@ export default function CharacterPage() {
                     : "border-text-dim bg-bg hover:border-torch"
                 }`}
               >
-                <p className="font-semibold">{option.label}</p>
-                <p className="mt-1 text-xs text-text-dim">{option.description}</p>
+                <p className="font-semibold text-lg">{option.label}</p>
+                <p className="mt-1 text-sm text-text-dim">{option.description}</p>
               </button>
             ))}
           </div>
 
           <div className="space-y-2">
-            <label className="text-sm font-medium">Poveste si descriere (optional)</label>
+            <label className="text-base font-medium">Poveste si descriere (optional)</label>
             <textarea
               value={backstory}
               onChange={(event) => {
@@ -128,9 +128,9 @@ export default function CharacterPage() {
               placeholder="Cine este eroul tau? De unde vine, ce vrea, ce trasaturi il definesc?"
               maxLength={2000}
               rows={5}
-              className="w-full resize-y border-4 border-text-dim bg-bg text-text px-3 py-2 text-sm placeholder:text-text-dim focus:border-torch focus:outline-none"
+              className="w-full resize-y border-4 border-text-dim bg-bg text-text px-3 py-2 text-lg placeholder:text-text-dim focus:border-torch focus:outline-none"
             />
-            <div className="flex items-center justify-between text-xs text-text-dim">
+            <div className="flex items-center justify-between text-sm text-text-dim">
               <span>{backstory.length}/2000</span>
               <span>DM-ul decide bonusurile pe baza povestii.</span>
             </div>
@@ -154,13 +154,13 @@ export default function CharacterPage() {
 
           {review ? (
             <div
-              className={`border-4 p-3 text-sm ${
+              className={`border-4 p-3 text-base ${
                 review.approved
                   ? "border-torch bg-torch/10"
-                  : "border-rose-500 bg-rose-950/40"
+                  : "border-hp bg-hp/10"
               }`}
             >
-              <p className="font-medium">
+              <p className="font-medium text-lg">
                 {review.approved ? "DM-ul aproba." : "DM-ul nu aproba."}
               </p>
               <p className="mt-1 text-text">{review.verdict}</p>
@@ -214,7 +214,7 @@ export default function CharacterPage() {
                 : "Incepe aventura"}
           </Button>
 
-          {error ? <p className="text-sm text-red-300">{error}</p> : null}
+          {error ? <p className="text-base text-hp">{error}</p> : null}
         </CardContent>
       </Card>
     </main>

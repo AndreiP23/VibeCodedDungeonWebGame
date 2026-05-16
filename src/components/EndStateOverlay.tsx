@@ -14,7 +14,7 @@ const CONTENT = {
     icon: "💀",
     body: "Drumul tau se opreste aici, dar legenda ramane in soaptele tavernei. Misterul fiicei primarului asteapta un alt erou.",
     cta: "Incepe o noua aventura",
-    accent: "border-rose-500",
+    accent: "border-hp",
   },
   victory: {
     title: "Victorie!",
@@ -47,8 +47,8 @@ export function EndStateOverlay({ variant, playerName, onPlayAgain }: EndStateOv
         >
           {content.title}
         </h2>
-        <p className="mt-2 text-sm text-text-dim">{playerName}</p>
-        <p className="mt-4 text-text-dim text-lg leading-relaxed">{content.body}</p>
+        <p className="mt-2 text-base text-text-dim">{playerName}</p>
+        <p className="mt-4 text-text-dim text-xl leading-relaxed">{content.body}</p>
         <Button onClick={onPlayAgain} className="mt-6 w-full">
           {content.cta}
         </Button>

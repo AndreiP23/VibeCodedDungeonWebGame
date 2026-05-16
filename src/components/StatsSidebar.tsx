@@ -69,7 +69,7 @@ export function StatsSidebar({ state }: StatsSidebarProps) {
           {state.player.avatarUrl ? (
             <Avatar url={state.player.avatarUrl} name={state.player.name} />
           ) : null}
-          <p className="text-text-dim text-lg capitalize">{state.player.class}</p>
+          <p className="text-text-dim text-xl capitalize">{state.player.class}</p>
         </div>
 
         <div className="mb-3">
@@ -80,29 +80,29 @@ export function StatsSidebar({ state }: StatsSidebarProps) {
               style={{ width: `${hpPercent}%`, boxShadow: "inset 0 -2px 0 rgba(0,0,0,0.3)" }}
             />
           </div>
-          <p className="text-text-dim text-sm mt-1">
+          <p className="text-text-dim text-base mt-1">
             {state.player.hp.current}/{state.player.hp.max}
           </p>
         </div>
 
-        <div className="grid grid-cols-2 gap-1 text-base text-text">
+        <div className="grid grid-cols-2 gap-1 text-lg text-text">
           <p>STR: {state.player.stats.str}</p>
           <p>DEX: {state.player.stats.dex}</p>
           <p>INT: {state.player.stats.int}</p>
           <p>CHA: {state.player.stats.cha}</p>
         </div>
 
-        <p className="mt-3 text-base text-gold">⛁ Aur: {state.player.gold}</p>
-        <p className="text-base text-text-dim">📍 {state.player.location}</p>
+        <p className="mt-3 text-lg text-gold">⛁ Aur: {state.player.gold}</p>
+        <p className="text-lg text-text-dim">📍 {state.player.location}</p>
 
         {state.player.flavorTrait ? (
-          <p className="mt-2 text-sm italic text-text-dim">{state.player.flavorTrait}</p>
+          <p className="mt-2 text-base italic text-text-dim">{state.player.flavorTrait}</p>
         ) : null}
       </SidebarPanel>
 
       {state.player.backstory ? (
         <SidebarPanel title="Poveste">
-          <p className="whitespace-pre-line text-sm leading-relaxed text-text-dim">
+          <p className="whitespace-pre-line text-base leading-relaxed text-text-dim">
             {state.player.backstory}
           </p>
         </SidebarPanel>
@@ -110,7 +110,7 @@ export function StatsSidebar({ state }: StatsSidebarProps) {
 
       <SidebarPanel title="Inventar">
         {state.player.inventory.length === 0 ? (
-          <p className="text-text-dim text-sm">Gol</p>
+          <p className="text-text-dim text-base">Gol</p>
         ) : (
           <div className="grid grid-cols-2 gap-2">
             {state.player.inventory.map((item) => (
@@ -125,23 +125,23 @@ export function StatsSidebar({ state }: StatsSidebarProps) {
       <SidebarPanel title="Quest Activ">
         {activeQuest ? (
           <div className="space-y-1">
-            <p className="text-torch text-base">{activeQuest.title}</p>
-            <p className="text-text-dim text-sm">{activeQuest.description}</p>
+            <p className="text-torch text-lg">{activeQuest.title}</p>
+            <p className="text-text-dim text-base">{activeQuest.description}</p>
           </div>
         ) : (
-          <p className="text-text-dim text-sm">Nu ai quest-uri active.</p>
+          <p className="text-text-dim text-base">Nu ai quest-uri active.</p>
         )}
       </SidebarPanel>
 
       <SidebarPanel title="Terminate">
         {completedQuests.length === 0 ? (
-          <p className="text-text-dim text-sm">Nimic încă.</p>
+          <p className="text-text-dim text-base">Nimic încă.</p>
         ) : (
           <div className="space-y-2">
             {completedQuests.map((quest) => (
               <div key={quest.id} className="flex items-center gap-2">
                 <Badge variant="success">✓</Badge>
-                <p className="text-base text-gold">{quest.title}</p>
+                <p className="text-lg text-gold">{quest.title}</p>
               </div>
             ))}
           </div>

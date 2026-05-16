@@ -45,7 +45,7 @@ export function ChatMessage({ role, content, npcName }: ChatMessageProps) {
         className={`max-w-[90%] border-4 ${styles.wrap} p-3 shadow-[4px_4px_0_rgba(0,0,0,0.8)]`}
       >
         <p className={`font-display text-[10px] tracking-wider mb-2 ${styles.label}`}>{label}</p>
-        <p className={`text-lg leading-snug ${styles.text}`}>{content}</p>
+        <p className={`text-xl leading-snug ${styles.text}`}>{content}</p>
       </div>
     </div>
   );

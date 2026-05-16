@@ -325,6 +325,14 @@ export async function runDungeonMasterTurn(
     }
 
     messages.push({ role: "user", content: toolResults });
+
+    // Hard enforcement: after getNPCResponse, the DM's turn ends.
+    // The prompt forbids paraphrasing the NPC's dialogue, but the model tends
+    // to violate this rule in follow-up iterations where it emits more narration
+    // after the NPC speaks. Force-stopping the loop is the reliable fix.
+    if (toolUses.some((tu: any) => tu.name === "getNPCResponse")) {
+      break;
+    }
   }
 
   return {
