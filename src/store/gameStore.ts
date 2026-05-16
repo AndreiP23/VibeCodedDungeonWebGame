@@ -341,6 +341,7 @@ function runStreamWithHandlers(
 ) {
   let pendingDmId: string | null = null;
   let pendingDmDraft = "";
+  let dmFlushed = false;
 
   const flushPendingDm = () => {
     if (!pendingDmId || !pendingDmDraft) return;
@@ -353,6 +354,7 @@ function runStreamWithHandlers(
     }));
     pendingDmId = null;
     pendingDmDraft = "";
+    dmFlushed = true;
   };
 
   const ensurePendingDm = (): string => {
@@ -407,7 +409,7 @@ function runStreamWithHandlers(
             ? current.chat.map((entry) =>
                 entry.id === id ? { ...entry, content: narration } : entry,
               )
-            : narration
+            : narration && !dmFlushed
               ? [
                   ...current.chat,
                   { id: crypto.randomUUID(), role: "dm", content: narration },

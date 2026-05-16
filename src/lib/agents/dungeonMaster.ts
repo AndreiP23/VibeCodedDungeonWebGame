@@ -218,8 +218,16 @@ export async function runDungeonMasterTurn(
     // Check if any tool_use is requestPlayerRoll — if so, suspend.
     const rollToolUse = toolUses.find((tu) => tu.name === "requestPlayerRoll");
     if (rollToolUse) {
-      // Append the assistant message (with the pending tool_use) to history so resume can inject tool_result.
-      messages.push({ role: "assistant", content: response.content });
+      // Filter out sibling tool_uses so the assistant message we save contains
+      // ONLY the requestPlayerRoll tool_use. The resume path injects exactly one
+      // tool_result; if we kept sibling tool_uses here, they would be orphaned
+      // and Anthropic would reject the next call with
+      // "tool_use ids were found without tool_result blocks". The DM can re-issue
+      // any dropped tool after seeing the roll result.
+      const filteredContent = (response.content as any[]).filter(
+        (block) => block.type !== "tool_use" || block.id === rollToolUse.id,
+      );
+      messages.push({ role: "assistant", content: filteredContent });
 
       const sides = coerceSides(rollToolUse.input.sides);
       const checkType = coerceRollCheckType(rollToolUse.input.checkType);
