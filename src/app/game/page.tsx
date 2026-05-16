@@ -4,6 +4,7 @@ import { FormEvent, useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { ChatMessage } from "@/components/ChatMessage";
 import { DiceRoll } from "@/components/DiceRoll";
+import { DiceTray } from "@/components/DiceTray";
 import { EndStateOverlay } from "@/components/EndStateOverlay";
 import { StatsSidebar } from "@/components/StatsSidebar";
 import { Button } from "@/components/ui/button";
@@ -22,6 +23,7 @@ export default function GamePage() {
     latestRolls,
     loading,
     error,
+    pendingRoll,
     playTurn,
     initGame,
     playerClass,
@@ -137,21 +139,38 @@ export default function GamePage() {
             <button
               type="button"
               onClick={jumpToLatest}
-              className="absolute right-4 bottom-24 border-2 border-torch bg-bg text-torch px-3 py-1 font-display text-[10px] shadow-[2px_2px_0_rgba(0,0,0,0.8)]"
+              className="absolute right-4 bottom-44 border-2 border-torch bg-bg text-torch px-3 py-1 font-display text-[10px] shadow-[2px_2px_0_rgba(0,0,0,0.8)]"
             >
               ↓ ULTIMUL
             </button>
+          ) : null}
+
+          <DiceTray />
+
+          {pendingRoll ? (
+            <p className="px-4 py-1 font-display text-[9px] text-text-dim text-center">
+              Aruncă zarul de mai sus pentru a continua.
+            </p>
           ) : null}
 
           <form onSubmit={handleSubmit} className="shrink-0 flex gap-2 p-3 border-t-4 border-torch bg-bg">
             <input
               value={message}
               onChange={(e) => setMessage(e.target.value)}
-              placeholder={endState ? "Aventura s-a incheiat" : "Ce faci?"}
+              placeholder={
+                endState
+                  ? "Aventura s-a incheiat"
+                  : pendingRoll
+                    ? "Aruncă zarul cerut..."
+                    : "Ce faci?"
+              }
               className="flex-1 h-11 border-4 border-text-dim bg-bg text-text text-lg px-3 focus:border-torch focus:outline-none"
-              disabled={loading || endState !== null}
+              disabled={loading || endState !== null || pendingRoll !== null}
             />
-            <Button type="submit" disabled={loading || endState !== null || !message.trim()}>
+            <Button
+              type="submit"
+              disabled={loading || endState !== null || pendingRoll !== null || !message.trim()}
+            >
               {loading ? "..." : "Trimite"}
             </Button>
           </form>
