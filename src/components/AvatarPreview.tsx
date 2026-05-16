@@ -10,6 +10,10 @@ interface AvatarPreviewProps {
   onReroll: () => void;
 }
 
+function proxyUrl(rawUrl: string): string {
+  return `/api/image-proxy?url=${encodeURIComponent(rawUrl)}`;
+}
+
 export function AvatarPreview({ image, rolling, onReroll }: AvatarPreviewProps) {
   const buttonLabel = image ? "🎲 Re-roll Avatar" : "🎲 Generate Avatar";
 
@@ -31,7 +35,7 @@ export function AvatarPreview({ image, rolling, onReroll }: AvatarPreviewProps) 
         {showImg ? (
           // eslint-disable-next-line @next/next/no-img-element
           <img
-            src={image.url}
+            src={proxyUrl(image.url)}
             alt="Hero portrait"
             width={256}
             height={256}

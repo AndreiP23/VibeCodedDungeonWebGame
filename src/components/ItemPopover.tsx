@@ -13,6 +13,10 @@ interface ItemPopoverProps {
 // Module-level client cache so re-hovers in the same session are instant.
 const clientImageCache = new Map<string, GeneratedImage>();
 
+function proxyUrl(rawUrl: string): string {
+  return `/api/image-proxy?url=${encodeURIComponent(rawUrl)}`;
+}
+
 const RARITY_BORDER: Record<ItemRarity, string> = {
   common: "border-text-dim",
   uncommon: "border-xp",
@@ -103,7 +107,7 @@ export function ItemPopover({ item, anchorEl, open }: ItemPopoverProps) {
         {image ? (
           // eslint-disable-next-line @next/next/no-img-element
           <img
-            src={image.url}
+            src={proxyUrl(image.url)}
             alt={item.name}
             width={128}
             height={128}
