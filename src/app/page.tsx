@@ -2,33 +2,37 @@ import Link from "next/link";
 
 export default function HomePage() {
   return (
-    <main className="min-h-screen bg-gradient-to-b from-zinc-950 via-zinc-900 to-zinc-950 text-zinc-100">
-      <section className="mx-auto flex min-h-screen max-w-5xl flex-col items-center justify-center gap-8 px-6 text-center">
-        <p className="rounded-full border border-amber-500/30 bg-amber-500/10 px-4 py-1 text-xs uppercase tracking-[0.2em] text-amber-300">
-          DungeonMaster AI
-        </p>
-        <h1 className="font-serif text-5xl font-semibold leading-tight md:text-6xl">
-          Aventura RPG text-based cu 2 agenti AI
-        </h1>
-        <p className="max-w-2xl text-zinc-300">
-          Porneste personajul, vorbeste cu NPC-uri, treci skill checks si lasa Dungeon Master
-          Agent sa orchestreze consecintele in timp real.
-        </p>
-        <div className="flex gap-3">
-          <Link
-            href="/character"
-            className="inline-flex h-11 items-center justify-center rounded-md bg-primary px-8 text-sm font-medium text-primary-foreground"
-          >
-            Creeaza personaj
-          </Link>
-          <Link
-            href="/game"
-            className="inline-flex h-11 items-center justify-center rounded-md bg-muted px-8 text-sm font-medium text-foreground"
-          >
-            Intra in joc
-          </Link>
-        </div>
-      </section>
+    <main className="min-h-screen flex flex-col items-center justify-center px-6 text-center">
+      <h1
+        className="font-display text-3xl md:text-5xl text-torch mb-4"
+        style={{
+          textShadow:
+            "0 0 20px rgba(255,157,0,0.6), 0 0 40px rgba(255,157,0,0.3), 4px 4px 0 rgba(0,0,0,0.8)",
+        }}
+      >
+        DungeonMaster AI
+      </h1>
+      <p className="font-display text-[10px] tracking-wider text-gold mb-8 uppercase">
+        Type your destiny. Roll the dice.
+      </p>
+      <p className="text-text-dim text-lg max-w-xl mb-10 leading-relaxed">
+        Aventura RPG text-based, condusă de doi agenți Claude. Tu arunci zarurile.
+        Tu hotărăști drumul.
+      </p>
+      <div className="flex flex-col md:flex-row gap-4">
+        <Link
+          href="/character"
+          className="inline-flex items-center justify-center h-12 px-8 border-4 border-torch bg-torch text-bg font-display uppercase tracking-wider text-xs shadow-[4px_4px_0_rgba(0,0,0,0.8)] hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-[2px_2px_0_rgba(0,0,0,0.8)] active:translate-x-[4px] active:translate-y-[4px] active:shadow-none"
+        >
+          Start Adventure
+        </Link>
+        <Link
+          href="/game"
+          className="inline-flex items-center justify-center h-12 px-8 border-4 border-text-dim bg-bg text-text-dim font-display uppercase tracking-wider text-xs shadow-[4px_4px_0_rgba(0,0,0,0.8)] hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-[2px_2px_0_rgba(0,0,0,0.8)] active:translate-x-[4px] active:translate-y-[4px] active:shadow-none"
+        >
+          Continuă
+        </Link>
+      </div>
     </main>
   );
 }
