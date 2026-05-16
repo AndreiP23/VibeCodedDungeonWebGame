@@ -20,6 +20,7 @@ interface InitOptions {
   sessionId?: string;
   backstory?: string;
   bonuses?: PlayerBonuses;
+  avatarUrl?: string;
 }
 
 interface GameStoreState {
@@ -179,6 +180,7 @@ export const useGameStore = create<GameStoreState>((set, get) => ({
           playerClass,
           backstory: options?.backstory,
           bonuses: options?.bonuses,
+          avatarUrl: options?.avatarUrl,
         }),
       });
       const payload = (await response.json()) as InitApiResponse;
