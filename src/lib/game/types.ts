@@ -7,6 +7,10 @@ export type SkillType =
   | "Perception"
   | "Athletics";
 
+export type RollCheckType = SkillType | "Damage" | "Attack";
+
+export type DiceSides = 4 | 6 | 8 | 10 | 12 | 20;
+
 export interface Quest {
   id: string;
   title: string;
@@ -78,11 +82,21 @@ export interface GameState {
 }
 
 export interface DiceRollResult {
-  checkType: SkillType;
+  checkType: RollCheckType;
+  sides: DiceSides;
   roll: number;
+  modifier: number;
   total: number;
-  success: boolean;
-  difficulty: number;
+  difficulty: number | null;
+  success: boolean | null;
+}
+
+export interface RollRequest {
+  sides: DiceSides;
+  modifier: number;
+  checkType: RollCheckType;
+  difficulty?: number;
+  toolUseId: string;
 }
 
 export interface TurnResult {

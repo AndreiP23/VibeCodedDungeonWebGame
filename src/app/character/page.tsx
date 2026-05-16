@@ -69,10 +69,18 @@ export default function CharacterPage() {
   const hasBackstory = backstory.trim().length > 0;
 
   return (
-    <main className="min-h-screen bg-gradient-to-b from-zinc-950 via-zinc-900 to-zinc-950 px-4 py-10 text-zinc-100">
-      <Card className="mx-auto max-w-2xl border-zinc-700 bg-zinc-900/80">
+    <main className="min-h-screen px-4 py-10 text-text">
+      <Card className="mx-auto max-w-2xl border-4 border-torch bg-bg shadow-[4px_4px_0_rgba(0,0,0,0.8)]">
         <CardHeader>
-          <CardTitle className="text-3xl">Creare Personaj</CardTitle>
+          <CardTitle
+            className="font-display text-3xl text-torch"
+            style={{
+              textShadow:
+                "0 0 20px rgba(255,157,0,0.6), 0 0 40px rgba(255,157,0,0.3), 4px 4px 0 rgba(0,0,0,0.8)",
+            }}
+          >
+            Creare Personaj
+          </CardTitle>
         </CardHeader>
         <CardContent className="space-y-6">
           <div className="space-y-2">
@@ -84,7 +92,7 @@ export default function CharacterPage() {
                 clearReview();
               }}
               placeholder="Numele eroului"
-              className="border-zinc-700 bg-zinc-950"
+              className="border-4 border-text-dim bg-bg text-text focus:border-torch focus:outline-none"
             />
           </div>
 
@@ -97,14 +105,14 @@ export default function CharacterPage() {
                   setPlayerClass(option.value);
                   clearReview();
                 }}
-                className={`rounded-lg border p-3 text-left transition ${
+                className={`border-4 p-3 text-left transition ${
                   playerClass === option.value
-                    ? "border-amber-400 bg-amber-500/10"
-                    : "border-zinc-700 bg-zinc-950 hover:border-zinc-500"
+                    ? "border-torch bg-torch/10"
+                    : "border-text-dim bg-bg hover:border-torch"
                 }`}
               >
                 <p className="font-semibold">{option.label}</p>
-                <p className="mt-1 text-xs text-zinc-400">{option.description}</p>
+                <p className="mt-1 text-xs text-text-dim">{option.description}</p>
               </button>
             ))}
           </div>
@@ -120,9 +128,9 @@ export default function CharacterPage() {
               placeholder="Cine este eroul tau? De unde vine, ce vrea, ce trasaturi il definesc?"
               maxLength={2000}
               rows={5}
-              className="w-full resize-y rounded-md border border-zinc-700 bg-zinc-950 px-3 py-2 text-sm placeholder:text-zinc-500 focus-visible:outline-none focus-visible:ring-2"
+              className="w-full resize-y border-4 border-text-dim bg-bg text-text px-3 py-2 text-sm placeholder:text-text-dim focus:border-torch focus:outline-none"
             />
-            <div className="flex items-center justify-between text-xs text-zinc-500">
+            <div className="flex items-center justify-between text-xs text-text-dim">
               <span>{backstory.length}/2000</span>
               <span>DM-ul decide bonusurile pe baza povestii.</span>
             </div>
@@ -146,40 +154,40 @@ export default function CharacterPage() {
 
           {review ? (
             <div
-              className={`rounded-md border p-3 text-sm ${
+              className={`border-4 p-3 text-sm ${
                 review.approved
-                  ? "border-emerald-500/40 bg-emerald-500/10"
-                  : "border-rose-500/40 bg-rose-500/10"
+                  ? "border-torch bg-torch/10"
+                  : "border-rose-500 bg-rose-950/40"
               }`}
             >
               <p className="font-medium">
                 {review.approved ? "DM-ul aproba." : "DM-ul nu aproba."}
               </p>
-              <p className="mt-1 text-zinc-200">{review.verdict}</p>
+              <p className="mt-1 text-text">{review.verdict}</p>
 
               {review.approved ? (
-                <div className="mt-3 space-y-1 text-zinc-200">
+                <div className="mt-3 space-y-1 text-text">
                   {review.bonuses.items.length > 0 ? (
                     <p>
-                      <span className="text-zinc-400">Obiecte: </span>
+                      <span className="text-text-dim">Obiecte: </span>
                       {review.bonuses.items.join(", ")}
                     </p>
                   ) : null}
                   {review.bonuses.statBonus ? (
                     <p>
-                      <span className="text-zinc-400">Bonus stat: </span>+
+                      <span className="text-text-dim">Bonus stat: </span>+
                       {review.bonuses.statBonus.amount}{" "}
                       {STAT_LABEL[review.bonuses.statBonus.stat]}
                     </p>
                   ) : null}
                   {review.bonuses.goldBonus && review.bonuses.goldBonus > 0 ? (
                     <p>
-                      <span className="text-zinc-400">Aur: </span>+{review.bonuses.goldBonus}
+                      <span className="text-text-dim">Aur: </span>+{review.bonuses.goldBonus}
                     </p>
                   ) : null}
                   {review.bonuses.flavorTrait ? (
                     <p>
-                      <span className="text-zinc-400">Trasatura: </span>
+                      <span className="text-text-dim">Trasatura: </span>
                       {review.bonuses.flavorTrait}
                     </p>
                   ) : null}
@@ -187,7 +195,7 @@ export default function CharacterPage() {
                   !review.bonuses.statBonus &&
                   !review.bonuses.goldBonus &&
                   !review.bonuses.flavorTrait ? (
-                    <p className="text-zinc-400">Niciun bonus mecanic, doar aroma narativa.</p>
+                    <p className="text-text-dim">Niciun bonus mecanic, doar aroma narativa.</p>
                   ) : null}
                 </div>
               ) : null}

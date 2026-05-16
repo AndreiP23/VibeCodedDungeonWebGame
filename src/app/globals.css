@@ -3,18 +3,41 @@
 @tailwind utilities;
 
 :root {
-  --background: 222 47% 8%;
-  --foreground: 210 40% 96%;
-  --card: 222 45% 12%;
-  --card-foreground: 210 40% 96%;
-  --primary: 33 95% 56%;
-  --primary-foreground: 222 47% 10%;
-  --muted: 222 35% 18%;
-  --muted-foreground: 215 20% 70%;
-  --border: 217 33% 30%;
-  --input: 217 33% 26%;
-  --accent: 196 70% 45%;
-  --accent-foreground: 210 40% 97%;
+  /* Vibe tokens (landing.html palette) */
+  --bg: #06060f;
+  --sky: #0d1b3e;
+  --torch: #ff9d00;
+  --torch2: #ffcc44;
+  --fire: #ff4500;
+  --gold: #ffd700;
+  --text: #ffe4b5;
+  --text-dim: #c4a882;
+  --hp: #e74c3c;
+  --mp: #3498db;
+  --xp: #2ecc71;
+  --gem-blue: #00cfff;
+  --gem-red: #ff3355;
+  --gem-purple: #bb44ff;
+  --gem-green: #44ff99;
+
+  /* Shadcn-style semantic aliases consumed by existing components */
+  --background: var(--bg);
+  --foreground: var(--text);
+  --card: var(--sky);
+  --card-foreground: var(--text);
+  --primary: var(--torch);
+  --primary-foreground: var(--bg);
+  --secondary: #1a1a2e;
+  --secondary-foreground: var(--text);
+  --muted: #1a1a2e;
+  --muted-foreground: var(--text-dim);
+  --border: #2a2a4a;
+  --input: #16162a;
+  --accent: var(--gem-blue);
+  --accent-foreground: var(--bg);
+  --destructive: var(--hp);
+  --destructive-foreground: var(--text);
+  --ring: var(--torch);
 }
 
 html,
@@ -27,5 +50,90 @@ body {
 }
 
 body {
-  font-family: var(--font-display), "Segoe UI", sans-serif;
+  font-family: var(--font-body), "VT323", monospace;
+  background: var(--bg);
+  color: var(--text);
+  background-image:
+    repeating-linear-gradient(0deg, transparent 0px, transparent 15px, rgba(0, 0, 0, 0.15) 15px, rgba(0, 0, 0, 0.15) 16px),
+    repeating-linear-gradient(90deg, transparent 0px, transparent 15px, rgba(0, 0, 0, 0.1) 15px, rgba(0, 0, 0, 0.1) 16px);
+}
+
+.font-display {
+  font-family: var(--font-display), "Press Start 2P", monospace;
+  letter-spacing: 0.02em;
+}
+
+.pixel-border {
+  border: 4px solid var(--torch);
+  box-shadow: 4px 4px 0 rgba(0, 0, 0, 0.8);
+  border-radius: 0;
+}
+
+.torch-glow {
+  position: absolute;
+  width: 400px;
+  height: 400px;
+  background: radial-gradient(ellipse, rgba(255, 157, 0, 0.18) 0%, transparent 70%);
+  animation: glow-pulse 2s ease-in-out infinite;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.torch-glow.top-left {
+  top: -100px;
+  left: -100px;
+}
+
+.torch-glow.top-right {
+  top: -100px;
+  right: -100px;
+}
+
+@keyframes glow-pulse {
+  0%,
+  100% {
+    opacity: 0.6;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+@keyframes dice-shake {
+  0%,
+  100% {
+    transform: translate(0, 0) rotate(0deg);
+  }
+  20% {
+    transform: translate(-2px, -2px) rotate(-3deg);
+  }
+  40% {
+    transform: translate(2px, 1px) rotate(2deg);
+  }
+  60% {
+    transform: translate(-1px, 2px) rotate(-2deg);
+  }
+  80% {
+    transform: translate(2px, -1px) rotate(3deg);
+  }
+}
+
+.dice-shaking {
+  animation: dice-shake 0.16s linear infinite;
+}
+
+@keyframes torch-pulse-strong {
+  0%,
+  100% {
+    box-shadow: 0 0 16px var(--torch), 4px 4px 0 rgba(0, 0, 0, 0.8);
+    transform: scale(1.05);
+  }
+  50% {
+    box-shadow: 0 0 32px var(--torch), 0 0 60px rgba(255, 157, 0, 0.4), 4px 4px 0 rgba(0, 0, 0, 0.8);
+    transform: scale(1.12);
+  }
+}
+
+.dice-prompted {
+  animation: torch-pulse-strong 1.2s ease-in-out infinite;
 }
