@@ -1,15 +1,16 @@
 import type { Metadata } from "next";
-import { IBM_Plex_Mono, Space_Grotesk } from "next/font/google";
+import { Press_Start_2P, VT323 } from "next/font/google";
 import "./globals.css";
 
-const displayFont = Space_Grotesk({
+const displayFont = Press_Start_2P({
   variable: "--font-display",
+  weight: ["400"],
   subsets: ["latin"],
 });
 
-const monoFont = IBM_Plex_Mono({
-  variable: "--font-mono",
-  weight: ["400", "500", "600"],
+const bodyFont = VT323({
+  variable: "--font-body",
+  weight: ["400"],
   subsets: ["latin"],
 });
 
@@ -24,8 +25,12 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="ro" className={`${displayFont.variable} ${monoFont.variable}`}>
-      <body className="bg-background text-foreground antialiased">{children}</body>
+    <html lang="ro" className={`${displayFont.variable} ${bodyFont.variable}`}>
+      <body className="bg-background text-foreground antialiased">
+        <div className="torch-glow top-left" aria-hidden />
+        <div className="torch-glow top-right" aria-hidden />
+        <div className="relative z-10">{children}</div>
+      </body>
     </html>
   );
 }
