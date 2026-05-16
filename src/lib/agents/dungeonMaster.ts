@@ -346,7 +346,7 @@ export async function runDungeonMasterTurn(
   return {
     narration: clampNarrationSentences(
       accumulatedNarration.trim() ||
-        "Misterul se adanceste, dar drumul inca ti se deschide in fata.",
+        "The mystery deepens, but the road still opens before you.",
     ),
     npcDialogue,
     diceRolls,

@@ -3,7 +3,7 @@ import { z } from "zod";
 import { reviewCharacterBackstory } from "@/lib/agents/characterReview";
 
 const requestSchema = z.object({
-  playerName: z.string().min(1).max(40).default("Erou"),
+  playerName: z.string().min(1).max(40).default("Hero"),
   playerClass: z.enum(["warrior", "mage", "rogue"]),
   backstory: z.string().min(1).max(2000),
 });

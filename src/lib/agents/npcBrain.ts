@@ -14,11 +14,11 @@ export async function getNPCResponse(input: NPCResponseInput): Promise<string> {
   const npc = input.state.npcs.find((candidate) => candidate.id === input.npcId);
 
   if (!npc) {
-    return "Nu stiu despre cine vorbesti, strainule.";
+    return "I don't know who you're talking about, stranger.";
   }
 
   if (npc.location !== input.state.player.location) {
-    return `[NPC ${npc.name} este în ${npc.location}, jucătorul este în ${input.state.player.location}. NPC-ul nu poate vorbi cu jucătorul acum. Spune-i narativ jucătorului că nu vede pe nimeni cu acel nume aici.]`;
+    return `[NPC ${npc.name} is in ${npc.location}; the player is in ${input.state.player.location}. The NPC cannot speak to the player right now. Narratively tell the player they don't see anyone by that name here.]`;
   }
 
   const client = getAnthropicClient();
@@ -56,5 +56,5 @@ export async function getNPCResponse(input: NPCResponseInput): Promise<string> {
     .join("\n")
     .trim();
 
-  return text || `${npc.name} te priveste in tacere, cantarind fiecare cuvant.`;
+  return text || `${npc.name} watches you in silence, weighing every word.`;
 }

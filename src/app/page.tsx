@@ -16,8 +16,8 @@ export default function HomePage() {
         Type your destiny. Roll the dice.
       </p>
       <p className="text-text-dim text-lg max-w-xl mb-10 leading-relaxed">
-        Aventura RPG text-based, condusă de doi agenți Claude. Tu arunci zarurile.
-        Tu hotărăști drumul.
+        A text-based RPG adventure, driven by two Claude agents. You roll the dice.
+        You decide the road.
       </p>
       <div className="flex flex-col md:flex-row gap-4">
         <Link
@@ -30,7 +30,7 @@ export default function HomePage() {
           href="/game"
           className="inline-flex items-center justify-center h-12 px-8 border-4 border-text-dim bg-bg text-text-dim font-display uppercase tracking-wider text-xs shadow-[4px_4px_0_rgba(0,0,0,0.8)] hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-[2px_2px_0_rgba(0,0,0,0.8)] active:translate-x-[4px] active:translate-y-[4px] active:shadow-none"
         >
-          Continuă
+          Continue
         </Link>
       </div>
     </main>

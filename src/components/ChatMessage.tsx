@@ -5,10 +5,10 @@ interface ChatMessageProps {
 }
 
 const roleLabel: Record<ChatMessageProps["role"], string> = {
-  player: "Tu",
+  player: "You",
   dm: "Dungeon Master",
   npc: "NPC",
-  system: "Sistem",
+  system: "System",
 };
 
 const roleClasses: Record<ChatMessageProps["role"], { wrap: string; label: string; text: string }> = {

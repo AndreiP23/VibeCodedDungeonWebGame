@@ -33,7 +33,7 @@ const bonusesSchema = z
 const requestSchema = z.object({
   action: z.enum(["init", "turn", "roll"]).default("turn"),
   sessionId: z.string().optional(),
-  playerName: z.string().min(1).default("Erou"),
+  playerName: z.string().min(1).default("Hero"),
   playerClass: z.enum(["warrior", "mage", "rogue"]).default("warrior"),
   message: z.string().optional(),
   backstory: z.string().max(2000).optional(),
@@ -134,7 +134,7 @@ export async function POST(request: NextRequest) {
 
     if (payload.action === "init") {
       const introNarration = game.created
-        ? "Usa tavernei Coroana Sparta se inchide in urma ta, iar ochii obisnuitilor se intorc spre noul vanator de secrete."
+        ? "The door of the Broken Crown Tavern closes behind you, and the regulars' eyes turn to the new hunter of secrets."
         : game.state.world.currentScene;
 
       return NextResponse.json({

@@ -10,17 +10,17 @@ interface EndStateOverlayProps {
 
 const CONTENT = {
   death: {
-    title: "Ai cazut.",
+    title: "You have fallen.",
     icon: "💀",
-    body: "Drumul tau se opreste aici, dar legenda ramane in soaptele tavernei. Misterul fiicei primarului asteapta un alt erou.",
-    cta: "Incepe o noua aventura",
+    body: "Your road ends here, but the legend lingers in the tavern's whispers. The mystery of the mayor's daughter awaits another hero.",
+    cta: "Start a new adventure",
     accent: "border-hp",
   },
   victory: {
-    title: "Victorie!",
+    title: "Victory!",
     icon: "🏆",
-    body: "Fiica primarului e in siguranta, iar numele tau se va auzi din taverna pana la portile orasului. Aventura ta s-a incheiat cu glorie.",
-    cta: "Joaca din nou",
+    body: "The mayor's daughter is safe, and your name will be heard from the tavern to the city gates. Your adventure ended in glory.",
+    cta: "Play again",
     accent: "border-torch",
   },
 } as const;

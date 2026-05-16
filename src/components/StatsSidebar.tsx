@@ -92,7 +92,7 @@ export function StatsSidebar({ state }: StatsSidebarProps) {
           <p>CHA: {state.player.stats.cha}</p>
         </div>
 
-        <p className="mt-3 text-lg text-gold">⛁ Aur: {state.player.gold}</p>
+        <p className="mt-3 text-lg text-gold">⛁ Gold: {state.player.gold}</p>
         <p className="text-lg text-text-dim">📍 {state.player.location}</p>
 
         {state.player.flavorTrait ? (
@@ -101,16 +101,16 @@ export function StatsSidebar({ state }: StatsSidebarProps) {
       </SidebarPanel>
 
       {state.player.backstory ? (
-        <SidebarPanel title="Poveste">
+        <SidebarPanel title="Backstory">
           <p className="whitespace-pre-line text-base leading-relaxed text-text-dim">
             {state.player.backstory}
           </p>
         </SidebarPanel>
       ) : null}
 
-      <SidebarPanel title="Inventar">
+      <SidebarPanel title="Inventory">
         {state.player.inventory.length === 0 ? (
-          <p className="text-text-dim text-base">Gol</p>
+          <p className="text-text-dim text-base">Empty</p>
         ) : (
           <div className="grid grid-cols-2 gap-2">
             {state.player.inventory.map((item) => (
@@ -122,20 +122,20 @@ export function StatsSidebar({ state }: StatsSidebarProps) {
         )}
       </SidebarPanel>
 
-      <SidebarPanel title="Quest Activ">
+      <SidebarPanel title="Active Quest">
         {activeQuest ? (
           <div className="space-y-1">
             <p className="text-torch text-lg">{activeQuest.title}</p>
             <p className="text-text-dim text-base">{activeQuest.description}</p>
           </div>
         ) : (
-          <p className="text-text-dim text-base">Nu ai quest-uri active.</p>
+          <p className="text-text-dim text-base">No active quests.</p>
         )}
       </SidebarPanel>
 
-      <SidebarPanel title="Terminate">
+      <SidebarPanel title="Completed">
         {completedQuests.length === 0 ? (
-          <p className="text-text-dim text-base">Nimic încă.</p>
+          <p className="text-text-dim text-base">Nothing yet.</p>
         ) : (
           <div className="space-y-2">
             {completedQuests.map((quest) => (

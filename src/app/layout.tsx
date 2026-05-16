@@ -16,7 +16,7 @@ const bodyFont = VT323({
 
 export const metadata: Metadata = {
   title: "DungeonMaster AI",
-  description: "MVP RPG text-based cu 2 agenti Claude si reguli deterministe de joc.",
+  description: "MVP text-based RPG with 2 Claude agents and deterministic game rules.",
 };
 
 export default function RootLayout({
@@ -25,7 +25,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="ro" className={`${displayFont.variable} ${bodyFont.variable}`}>
+    <html lang="en" className={`${displayFont.variable} ${bodyFont.variable}`}>
       <body className="bg-background text-foreground antialiased">
         <div className="torch-glow top-left" aria-hidden />
         <div className="torch-glow top-right" aria-hidden />

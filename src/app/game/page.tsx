@@ -43,7 +43,7 @@ export default function GamePage() {
         ? new URLSearchParams(window.location.search).get("sessionId")
         : null;
     if (incomingSession) {
-      void initGame(playerName || "Erou", playerClass, { sessionId: incomingSession });
+      void initGame(playerName || "Hero", playerClass, { sessionId: incomingSession });
       return;
     }
     router.replace("/character");
@@ -73,7 +73,7 @@ export default function GamePage() {
   if (!gameState) {
     return (
       <main className="flex h-screen items-center justify-center">
-        <p className="font-display text-xs text-torch animate-pulse">SE INCARCA...</p>
+        <p className="font-display text-xs text-torch animate-pulse">LOADING...</p>
       </main>
     );
   }
@@ -97,7 +97,7 @@ export default function GamePage() {
     <main className="h-screen flex flex-col overflow-hidden">
       <header className="shrink-0 flex items-center justify-between px-4 py-3 border-b-4 border-torch bg-bg">
         <h1 className="font-display text-sm text-torch">
-          SESIUNE #{sessionId?.slice(0, 8).toUpperCase()}
+          SESSION #{sessionId?.slice(0, 8).toUpperCase()}
         </h1>
         <Button
           variant="ghost"
@@ -130,7 +130,7 @@ export default function GamePage() {
             ) : null}
             {loading ? (
               <p className="font-display text-[10px] tracking-wider text-text-dim animate-pulse">
-                DUNGEON MASTER GANDESTE...
+                DUNGEON MASTER IS THINKING...
               </p>
             ) : null}
           </div>
@@ -141,7 +141,7 @@ export default function GamePage() {
               onClick={jumpToLatest}
               className="absolute right-4 bottom-44 border-2 border-torch bg-bg text-torch px-3 py-1 font-display text-[10px] shadow-[2px_2px_0_rgba(0,0,0,0.8)]"
             >
-              ↓ ULTIMUL
+              ↓ LATEST
             </button>
           ) : null}
 
@@ -149,7 +149,7 @@ export default function GamePage() {
 
           {pendingRoll ? (
             <p className="px-4 py-1 font-display text-[9px] text-text-dim text-center">
-              Aruncă zarul de mai sus pentru a continua.
+              Roll the die above to continue.
             </p>
           ) : null}
 
@@ -159,10 +159,10 @@ export default function GamePage() {
               onChange={(e) => setMessage(e.target.value)}
               placeholder={
                 endState
-                  ? "Aventura s-a incheiat"
+                  ? "The adventure is over"
                   : pendingRoll
-                    ? "Aruncă zarul cerut..."
-                    : "Ce faci?"
+                    ? "Roll the requested die..."
+                    : "What do you do?"
               }
               className="flex-1 h-11 border-4 border-text-dim bg-bg text-text text-lg px-3 focus:border-torch focus:outline-none"
               disabled={loading || endState !== null || pendingRoll !== null}
@@ -171,7 +171,7 @@ export default function GamePage() {
               type="submit"
               disabled={loading || endState !== null || pendingRoll !== null || !message.trim()}
             >
-              {loading ? "..." : "Trimite"}
+              {loading ? "..." : "Send"}
             </Button>
           </form>
 

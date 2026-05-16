@@ -73,7 +73,7 @@ export async function reviewCharacterBackstory(
     return {
       approved: false,
       verdict:
-        "Povestea e prea scurta. Adauga cateva detalii despre origine, motivatie si o trasatura definitorie.",
+        "The backstory is too short. Add a few details about origin, motivation, and one defining trait.",
       bonuses: { items: [] },
     };
   }
@@ -117,7 +117,7 @@ export async function reviewCharacterBackstory(
     return {
       approved: false,
       verdict:
-        "DM-ul a ezitat. Rescrie povestea cu cateva detalii clare despre eroul tau.",
+        "The DM hesitated. Rewrite the backstory with a few clear details about your hero.",
       bonuses: { items: [] },
     };
   }
@@ -127,7 +127,7 @@ export async function reviewCharacterBackstory(
     return {
       approved: false,
       verdict:
-        "DM-ul nu a putut interpreta povestea. Incearca din nou cu o descriere clara.",
+        "The DM could not interpret the backstory. Try again with a clearer description.",
       bonuses: { items: [] },
     };
   }

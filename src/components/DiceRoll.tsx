@@ -15,7 +15,7 @@ export function DiceRoll({ roll }: DiceRollProps) {
   const detail = isDamage
     ? `${roll.checkType}: ${roll.total} dmg (${roll.roll}${sign}${roll.modifier})`
     : `${roll.checkType}: ${roll.total} (${roll.roll}${sign}${roll.modifier}) - ${
-        roll.success ? "Succes" : "Esuat"
+        roll.success ? "Success" : "Failed"
       }`;
 
   return (

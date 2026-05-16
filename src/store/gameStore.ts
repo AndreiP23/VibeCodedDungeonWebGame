@@ -86,7 +86,7 @@ async function streamPost(
   });
 
   if (!response.ok || !response.body) {
-    let errorMessage = "Cerere esuata.";
+    let errorMessage = "Request failed.";
     try {
       const errorPayload = (await response.json()) as { error?: string };
       if (errorPayload.error) errorMessage = errorPayload.error;
@@ -183,7 +183,7 @@ export const useGameStore = create<GameStoreState>((set, get) => ({
       });
       const payload = (await response.json()) as InitApiResponse;
       if (!response.ok || payload.error) {
-        throw new Error(payload.error ?? "Nu am putut initializa jocul.");
+        throw new Error(payload.error ?? "Could not initialize the game.");
       }
       const history: ChatEntry[] = payload.state.shortTermMemory
         .filter((entry) => entry.role !== "system")
@@ -209,7 +209,7 @@ export const useGameStore = create<GameStoreState>((set, get) => ({
     } catch (error) {
       set({
         loading: false,
-        error: error instanceof Error ? error.message : "Eroare necunoscuta.",
+        error: error instanceof Error ? error.message : "Unknown error.",
       });
     }
   },
@@ -227,7 +227,7 @@ export const useGameStore = create<GameStoreState>((set, get) => ({
         | { error: string };
       if (!response.ok || "error" in payload) {
         const errorMessage =
-          "error" in payload ? payload.error : "Nu am putut obtine binecuvantarea DM-ului.";
+          "error" in payload ? payload.error : "Could not get the DM's blessing.";
         set({ reviewing: false, error: errorMessage });
         return null;
       }
@@ -236,7 +236,7 @@ export const useGameStore = create<GameStoreState>((set, get) => ({
     } catch (error) {
       set({
         reviewing: false,
-        error: error instanceof Error ? error.message : "Eroare necunoscuta.",
+        error: error instanceof Error ? error.message : "Unknown error.",
       });
       return null;
     }
@@ -245,11 +245,11 @@ export const useGameStore = create<GameStoreState>((set, get) => ({
   playTurn: async (message) => {
     const state = get();
     if (!state.sessionId || !state.gameState) {
-      set({ error: "Jocul nu este initializat." });
+      set({ error: "The game is not initialized." });
       return;
     }
     if (state.pendingRoll) {
-      set({ error: "Aruncă zarul cerut înainte să continui." });
+      set({ error: "Roll the requested die before continuing." });
       return;
     }
 
@@ -422,7 +422,7 @@ function runStreamWithHandlers(
   }).catch((error: unknown) => {
     set(() => ({
       loading: false,
-      error: error instanceof Error ? error.message : "Eroare necunoscuta.",
+      error: error instanceof Error ? error.message : "Unknown error.",
     }));
   });
 }

@@ -73,9 +73,9 @@ export function DiceTray() {
     <div className="shrink-0 border-t-4 border-torch bg-bg p-3">
       {pendingRoll ? (
         <p className="font-display text-[10px] tracking-wider text-torch mb-2 text-center">
-          ARUNCA D{pendingRoll.sides}
+          ROLL D{pendingRoll.sides}
           {sign}
-          {pendingRoll.modifier} PENTRU {pendingRoll.checkType.toUpperCase()}
+          {pendingRoll.modifier} FOR {pendingRoll.checkType.toUpperCase()}
           {typeof pendingRoll.difficulty === "number" ? ` (DC ${pendingRoll.difficulty})` : ""}
         </p>
       ) : null}

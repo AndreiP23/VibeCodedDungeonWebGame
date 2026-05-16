@@ -12,17 +12,17 @@ const classOptions: Array<{ value: PlayerClass; label: string; description: stri
   {
     value: "warrior",
     label: "Warrior",
-    description: "Rezistent in lupta, domina confruntarile directe.",
+    description: "Tough in combat, dominates direct confrontations.",
   },
   {
     value: "mage",
     label: "Mage",
-    description: "Inteligenta ridicata, detecteaza si manipuleaza mistere arcane.",
+    description: "High intelligence, detects and manipulates arcane mysteries.",
   },
   {
     value: "rogue",
     label: "Rogue",
-    description: "Rapid si persuasiv, excelent in infiltrare si negociere.",
+    description: "Quick and persuasive, excellent at infiltration and negotiation.",
   },
 ];
 
@@ -53,12 +53,12 @@ export default function CharacterPage() {
   async function handleReview() {
     const trimmed = backstory.trim();
     if (!trimmed) return;
-    const result = await reviewCharacter(name.trim() || "Erou", playerClass, trimmed);
+    const result = await reviewCharacter(name.trim() || "Hero", playerClass, trimmed);
     if (result) setReview(result);
   }
 
   async function handleStart() {
-    await initGame(name.trim() || "Erou", playerClass, {
+    await initGame(name.trim() || "Hero", playerClass, {
       backstory: backstory.trim() || undefined,
       bonuses: review?.approved ? review.bonuses : undefined,
     });
@@ -79,19 +79,19 @@ export default function CharacterPage() {
                 "0 0 20px rgba(255,157,0,0.6), 0 0 40px rgba(255,157,0,0.3), 4px 4px 0 rgba(0,0,0,0.8)",
             }}
           >
-            Creare Personaj
+            Create Character
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-6">
           <div className="space-y-2">
-            <label className="text-base font-medium">Nume</label>
+            <label className="text-base font-medium">Name</label>
             <Input
               value={name}
               onChange={(event) => {
                 setName(event.target.value);
                 clearReview();
               }}
-              placeholder="Numele eroului"
+              placeholder="The hero's name"
               className="border-4 border-text-dim bg-bg text-text text-lg focus:border-torch focus:outline-none"
             />
           </div>
@@ -118,21 +118,21 @@ export default function CharacterPage() {
           </div>
 
           <div className="space-y-2">
-            <label className="text-base font-medium">Poveste si descriere (optional)</label>
+            <label className="text-base font-medium">Backstory and description (optional)</label>
             <textarea
               value={backstory}
               onChange={(event) => {
                 setBackstory(event.target.value);
                 clearReview();
               }}
-              placeholder="Cine este eroul tau? De unde vine, ce vrea, ce trasaturi il definesc?"
+              placeholder="Who is your hero? Where do they come from, what do they want, what traits define them?"
               maxLength={2000}
               rows={5}
               className="w-full resize-y border-4 border-text-dim bg-bg text-text px-3 py-2 text-lg placeholder:text-text-dim focus:border-torch focus:outline-none"
             />
             <div className="flex items-center justify-between text-sm text-text-dim">
               <span>{backstory.length}/2000</span>
-              <span>DM-ul decide bonusurile pe baza povestii.</span>
+              <span>The DM decides bonuses based on the backstory.</span>
             </div>
           </div>
 
@@ -145,10 +145,10 @@ export default function CharacterPage() {
               className="w-full"
             >
               {reviewing
-                ? "DM-ul citeste..."
+                ? "The DM is reading..."
                 : review
-                  ? "Cere DM-ului din nou"
-                  : "Cere binecuvantarea DM-ului"}
+                  ? "Ask the DM again"
+                  : "Ask for the DM's blessing"}
             </Button>
           ) : null}
 
@@ -161,7 +161,7 @@ export default function CharacterPage() {
               }`}
             >
               <p className="font-medium text-lg">
-                {review.approved ? "DM-ul aproba." : "DM-ul nu aproba."}
+                {review.approved ? "The DM approves." : "The DM does not approve."}
               </p>
               <p className="mt-1 text-text">{review.verdict}</p>
 
@@ -169,25 +169,25 @@ export default function CharacterPage() {
                 <div className="mt-3 space-y-1 text-text">
                   {review.bonuses.items.length > 0 ? (
                     <p>
-                      <span className="text-text-dim">Obiecte: </span>
+                      <span className="text-text-dim">Items: </span>
                       {review.bonuses.items.join(", ")}
                     </p>
                   ) : null}
                   {review.bonuses.statBonus ? (
                     <p>
-                      <span className="text-text-dim">Bonus stat: </span>+
+                      <span className="text-text-dim">Stat bonus: </span>+
                       {review.bonuses.statBonus.amount}{" "}
                       {STAT_LABEL[review.bonuses.statBonus.stat]}
                     </p>
                   ) : null}
                   {review.bonuses.goldBonus && review.bonuses.goldBonus > 0 ? (
                     <p>
-                      <span className="text-text-dim">Aur: </span>+{review.bonuses.goldBonus}
+                      <span className="text-text-dim">Gold: </span>+{review.bonuses.goldBonus}
                     </p>
                   ) : null}
                   {review.bonuses.flavorTrait ? (
                     <p>
-                      <span className="text-text-dim">Trasatura: </span>
+                      <span className="text-text-dim">Trait: </span>
                       {review.bonuses.flavorTrait}
                     </p>
                   ) : null}
@@ -195,7 +195,7 @@ export default function CharacterPage() {
                   !review.bonuses.statBonus &&
                   !review.bonuses.goldBonus &&
                   !review.bonuses.flavorTrait ? (
-                    <p className="text-text-dim">Niciun bonus mecanic, doar aroma narativa.</p>
+                    <p className="text-text-dim">No mechanical bonus, just narrative flavor.</p>
                   ) : null}
                 </div>
               ) : null}
@@ -208,10 +208,10 @@ export default function CharacterPage() {
             className="w-full"
           >
             {loading
-              ? "Se pregateste aventura..."
+              ? "Preparing the adventure..."
               : !canStart
-                ? "Cere intai aprobarea DM-ului"
-                : "Incepe aventura"}
+                ? "Get the DM's approval first"
+                : "Start the adventure"}
           </Button>
 
           {error ? <p className="text-base text-hp">{error}</p> : null}
