@@ -37,8 +37,8 @@ const CLASS_APPEARANCE: Record<PlayerClass, { base: string; details: string[] }>
 };
 
 const STYLE_SUFFIX =
-  "fantasy RPG character portrait, head and shoulders, painterly digital art, " +
-  "soft volumetric lighting, vivid color, intricate detail, centered composition";
+  "8-bit pixel art sprite, NES JRPG style, 16-color palette, " +
+  "sharp pixel edges, head and shoulders, plain dark background, centered composition, no text";
 
 function sanitizeBackstory(input: string): string {
   return input

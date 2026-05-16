@@ -106,6 +106,12 @@ export interface RollRequest {
   toolUseId: string;
 }
 
+export interface GeneratedImage {
+  url: string;
+  prompt: string;
+  seed: number;
+}
+
 export interface TurnResult {
   narration: string;
   npcDialogue?: string;

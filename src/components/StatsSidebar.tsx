@@ -1,7 +1,8 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Badge } from "@/components/ui/badge";
+import { ItemPopover } from "@/components/ItemPopover";
 import { GameState, InventoryItem, ItemRarity } from "@/lib/game/types";
 
 const RARITY_VARIANT: Record<ItemRarity, "secondary" | "success" | "gem-blue" | "gem-purple" | "gold"> = {
@@ -21,6 +22,45 @@ function toItem(entry: unknown): InventoryItem {
     ? (obj.rarity as ItemRarity)
     : "common";
   return { name, rarity };
+}
+
+function ItemBadgeWithPreview({ item }: { item: InventoryItem }) {
+  const [open, setOpen] = useState(false);
+  const triggerRef = useRef<HTMLDivElement | null>(null);
+  const enterTimerRef = useRef<number | null>(null);
+
+  const variant = RARITY_VARIANT[item.rarity];
+
+  function handleEnter() {
+    if (enterTimerRef.current !== null) {
+      window.clearTimeout(enterTimerRef.current);
+    }
+    enterTimerRef.current = window.setTimeout(() => setOpen(true), 150);
+  }
+
+  function handleLeave() {
+    if (enterTimerRef.current !== null) {
+      window.clearTimeout(enterTimerRef.current);
+      enterTimerRef.current = null;
+    }
+    setOpen(false);
+  }
+
+  return (
+    <div
+      ref={triggerRef}
+      onMouseEnter={handleEnter}
+      onMouseLeave={handleLeave}
+      onFocus={handleEnter}
+      onBlur={handleLeave}
+      tabIndex={0}
+    >
+      <Badge variant={variant} className="justify-center w-full" title={item.rarity}>
+        {item.name}
+      </Badge>
+      <ItemPopover item={item} anchorEl={triggerRef.current} open={open} />
+    </div>
+  );
 }
 
 function Avatar({ url, name }: { url: string; name: string }) {
@@ -135,14 +175,7 @@ export function StatsSidebar({ state }: StatsSidebarProps) {
             {state.player.inventory.map((entry, idx) => {
               const item = toItem(entry);
               return (
-                <Badge
-                  variant={RARITY_VARIANT[item.rarity]}
-                  key={`${item.name}-${idx}`}
-                  className="justify-center"
-                  title={item.rarity}
-                >
-                  {item.name}
-                </Badge>
+                <ItemBadgeWithPreview key={`${item.name}-${idx}`} item={item} />
               );
             })}
           </div>

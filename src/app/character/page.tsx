@@ -5,8 +5,9 @@ import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { CharacterReviewResult, PlayerClass } from "@/lib/game/types";
+import { CharacterReviewResult, GeneratedImage, PlayerClass } from "@/lib/game/types";
 import { useGameStore } from "@/store/gameStore";
+import { AvatarPreview } from "@/components/AvatarPreview";
 
 const classOptions: Array<{ value: PlayerClass; label: string; description: string }> = [
   {
@@ -39,6 +40,8 @@ export default function CharacterPage() {
   const [playerClass, setPlayerClass] = useState<PlayerClass>("warrior");
   const [backstory, setBackstory] = useState("");
   const [review, setReview] = useState<CharacterReviewResult | null>(null);
+  const [avatar, setAvatar] = useState<GeneratedImage | null>(null);
+  const [avatarRolling, setAvatarRolling] = useState(false);
 
   const initGame = useGameStore((state) => state.initGame);
   const reviewCharacter = useGameStore((state) => state.reviewCharacter);
@@ -57,10 +60,65 @@ export default function CharacterPage() {
     if (result) setReview(result);
   }
 
+  async function rerollAvatar() {
+    setAvatarRolling(true);
+    try {
+      const response = await fetch("/api/image", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          kind: "avatar",
+          playerClass,
+          backstory: backstory.trim() || undefined,
+          nameHint: name.trim() || undefined,
+        }),
+      });
+      if (!response.ok) {
+        throw new Error("Avatar generation failed.");
+      }
+      const data = (await response.json()) as GeneratedImage;
+      setAvatar(data);
+    } catch (err) {
+      console.warn("Avatar reroll failed:", err);
+    } finally {
+      setAvatarRolling(false);
+    }
+  }
+
   async function handleStart() {
+    // If the player hasn't generated an avatar yet, generate one now so the
+    // game starts with a real portrait (LLM-driven) rather than the template
+    // fallback baked into buildAvatarSpec.
+    let avatarUrl = avatar?.url;
+    if (!avatarUrl) {
+      setAvatarRolling(true);
+      try {
+        const response = await fetch("/api/image", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            kind: "avatar",
+            playerClass,
+            backstory: backstory.trim() || undefined,
+            nameHint: name.trim() || undefined,
+          }),
+        });
+        if (response.ok) {
+          const data = (await response.json()) as GeneratedImage;
+          avatarUrl = data.url;
+          setAvatar(data);
+        }
+      } catch {
+        // Fall through — server will use deterministic fallback.
+      } finally {
+        setAvatarRolling(false);
+      }
+    }
+
     await initGame(name.trim() || "Hero", playerClass, {
       backstory: backstory.trim() || undefined,
       bonuses: review?.approved ? review.bonuses : undefined,
+      avatarUrl,
     });
     router.push("/game");
   }
@@ -202,9 +260,15 @@ export default function CharacterPage() {
             </div>
           ) : null}
 
+          <AvatarPreview
+            image={avatar}
+            rolling={avatarRolling}
+            onReroll={rerollAvatar}
+          />
+
           <Button
             onClick={handleStart}
-            disabled={loading || reviewing || !canStart}
+            disabled={loading || reviewing || avatarRolling || !canStart}
             className="w-full"
           >
             {loading
