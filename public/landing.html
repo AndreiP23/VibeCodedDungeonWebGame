@@ -160,7 +160,15 @@ nav{
 /* hero content */
 .hero-content{
   position:relative;z-index:2;
-  text-align:center;margin-top:-80px;
+  text-align:center;margin-top:-20px;
+}
+.hero-logo{
+  display:block;
+  width:160px;height:160px;
+  margin:0 auto 20px;
+  image-rendering:pixelated;
+  filter:drop-shadow(0 0 24px rgba(255,157,0,0.5)) drop-shadow(0 0 48px rgba(0,207,255,0.22));
+  animation:glow-pulse 2.6s ease-in-out infinite;
 }
 .hero-badge{
   display:inline-block;
@@ -611,11 +619,11 @@ footer{
 
   <div class="hero-content">
     <img
+      class="hero-logo"
       src="/logo.png"
       alt="DungeonMaster AI logo"
       width="160"
       height="160"
-      style="margin:0 auto 18px;image-rendering:pixelated;filter:drop-shadow(0 0 24px rgba(255,157,0,0.45)) drop-shadow(0 0 48px rgba(0,207,255,0.25));animation:glow-pulse 2.6s ease-in-out infinite"
     />
     <div class="hero-badge">🎲 AI-POWERED TEXT RPG</div>
     <h1 class="hero-title">DUNGEONMASTER <span class="orange">AI</span></h1>
