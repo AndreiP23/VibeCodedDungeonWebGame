@@ -17,6 +17,11 @@ const bodyFont = VT323({
 export const metadata: Metadata = {
   title: "DungeonMaster AI",
   description: "MVP text-based RPG with 2 Claude agents and deterministic game rules.",
+  icons: {
+    icon: "/logo.png",
+    shortcut: "/logo.png",
+    apple: "/logo.png",
+  },
 };
 
 export default function RootLayout({

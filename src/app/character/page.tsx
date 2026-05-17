@@ -129,9 +129,22 @@ export default function CharacterPage() {
   return (
     <main className="min-h-screen px-4 py-10 text-text">
       <Card className="mx-auto max-w-2xl border-4 border-torch bg-bg shadow-[4px_4px_0_rgba(0,0,0,0.8)]">
-        <CardHeader>
+        <CardHeader className="flex flex-col items-center gap-3">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src="/logo.png"
+            alt="DungeonMaster AI"
+            width={80}
+            height={80}
+            className="h-20 w-20"
+            style={{
+              imageRendering: "pixelated",
+              filter:
+                "drop-shadow(0 0 16px rgba(255,157,0,0.5)) drop-shadow(0 0 32px rgba(0,207,255,0.2))",
+            }}
+          />
           <CardTitle
-            className="font-display text-3xl text-torch"
+            className="font-display text-3xl text-torch text-center"
             style={{
               textShadow:
                 "0 0 20px rgba(255,157,0,0.6), 0 0 40px rgba(255,157,0,0.3), 4px 4px 0 rgba(0,0,0,0.8)",

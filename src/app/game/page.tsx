@@ -96,9 +96,20 @@ export default function GamePage() {
   return (
     <main className="h-screen flex flex-col overflow-hidden">
       <header className="shrink-0 flex items-center justify-between px-4 py-3 border-b-4 border-torch bg-bg">
-        <h1 className="font-display text-sm text-torch">
-          SESSION #{sessionId?.slice(0, 8).toUpperCase()}
-        </h1>
+        <div className="flex items-center gap-3">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src="/logo.png"
+            alt="DungeonMaster AI"
+            width={32}
+            height={32}
+            className="h-8 w-8"
+            style={{ imageRendering: "pixelated" }}
+          />
+          <h1 className="font-display text-sm text-torch">
+            SESSION #{sessionId?.slice(0, 8).toUpperCase()}
+          </h1>
+        </div>
         <Button
           variant="ghost"
           size="sm"
